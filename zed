@@ -1,0 +1,167 @@
+#!/bin/bash
+VERSION=0.0.1
+
+#
+# ComFreeze - zed
+#
+echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
+
+#
+# Expects to always run at home
+#
+export ZED_TARGET_DIR=$( pwd )
+export ZED_DIR="$( cd "$( dirname "$( ls -l ${BASH_SOURCE[0]} | awk '{print $11}')" )" && pwd )"
+#cd $ZED_DIR
+echo "Using $ZED_DIR as root for ZED scripts..."
+
+#
+# Directory specifications
+#
+export CURDIR=$ZED_TARGET_DIR/
+export SCRIPTS="$ZED_DIR/.zed"
+export ZED_CONFIG=${CURDIR}config
+
+#
+# Includes
+#
+if [ -f $ZED_CONFIG ]; then
+	echo "Using config $ZED_CONFIG..."
+	source $ZED_CONFIG
+fi
+
+#
+# Parameters
+#
+while test $# -gt 0; do
+	case "$1" in
+		-p)
+			shift
+			if test $# -gt 0; then
+				echo "Setting $1"
+				PORTS="${PORTS} -p $1"
+			else
+				echo "No port specified"
+				exit 1
+			fi
+			shift
+			;;
+		--port*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			PORTS="$PORTS -p $DATA"
+			shift
+			;;
+		-v)
+			shift
+			if test $# -gt 0; then
+				echo "Setting $1"
+				VOLUMES="${VOLUMES} -v $1"
+			else
+				echo "No port specified"
+				exit 1
+			fi
+			shift
+			;;
+		--vol*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			VOLUMES="$VOLUMES -v $DATA"
+			shift
+			;;
+		-e)
+			shift
+			if test $# -gt 0; then
+				echo "Setting $1"
+				ENV_VARS="${ENV_VARS} -e $1"
+			else
+				echo "No var specified"
+				exit 1
+			fi
+			shift
+			;;
+		--env*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			ENV_VARS="$ENV_VARS -e $DATA"
+			shift
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+#
+# Fully qualified name:
+# e.g. hostname.domain:port/repository:tag
+#
+export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${REPOSITORY}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )
+
+#
+# Friendly name:
+# e.g. my-cool-server-3.0
+#
+export CONTAINER_NAME="$REPOSITORY-$TAG"
+
+#
+# Compiled launch parameters:
+# e.g. -p 80:80 -v /var/www -e APP_ENV=prod
+#
+export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
+
+export CONTAINER_SSH="$SSH_PORT"
+
+#
+# CLI User Interface
+#
+while test $# -gt 0; do
+	case "$1" in
+		-h|--help)
+			echo "zed - helper with docker container tooling"
+			echo " "
+			echo "zed [feature] [params] action [options]"
+			echo " "
+			echo " FEATURES: "
+			echo "   -a, --actions                    Show complete list of available actions"
+			echo "   -h, --help                       Show brief help"
+			echo "   -i, --info                       Show defined contants"
+			echo " "
+			echo " PARAMS: "
+			echo "   -e NAME=value                    Define an internal environment variable"
+			echo "   -p (###:)###                     Tunnel a port through the container [host:container]"
+			echo "   -v (/path:)/path                 Mount a virtual volume into the container [host:container]"
+			exit 0
+			;;
+		-i|--info)
+			echo "REGISTRY:       $REGISTRY"
+			echo "REPOSITORY:     $REPOSITORY"
+			echo "TAG:            $TAG"
+			echo "DOCKER_NAME:    $DOCKER_NAME"
+			echo "CONTAINER_NAME: $CONTAINER_NAME"
+			echo "CONTAINER_ARGS: $CONTAINER_ARGS"
+			exit 0
+			;;
+		-a|--actions)
+			cd $SCRIPTS
+			echo "Available actions:"
+			for ACTION_FILE in *
+			do
+				echo " * ${ACTION_FILE}"
+			done
+			cd $CURDIR
+			shift
+			;;
+                *)
+			if [[ -f "$SCRIPTS/$1" ]]; then
+				ACTION="$SCRIPTS/$1"
+				echo "ACTION: $ACTION"
+				shift
+			fi
+                        break
+                        ;;
+	esac
+done
+
+if [ "$ACTION" != "" ]; then
+	/bin/bash $ACTION $*
+	exit 0
+fi
+
+# echo $CONTAINER_ARGS

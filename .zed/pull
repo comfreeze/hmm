@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "Pulling $DOCKER_NAME..."
+
+docker pull $DOCKER_NAME

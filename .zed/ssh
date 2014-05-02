@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "Remoting into $DOCKER_NAME - $CONTAINER_SSH"
+
+ssh -p $CONTAINER_SSH comfreeze@localhost

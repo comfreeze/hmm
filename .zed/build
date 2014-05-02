@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "Building $DOCKER_NAME..."
+
+docker build -t $DOCKER_NAME .

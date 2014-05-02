@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "Starting $DOCKER_NAME..."
+echo " "
+
+docker start \
+ $* \
+ $DOCKER_NAME
