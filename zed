@@ -11,15 +11,15 @@ echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput se
 #
 export ZED_TARGET_DIR=$( pwd )
 export ZED_DIR="$( cd "$( dirname "$( ls -l ${BASH_SOURCE[0]} | awk '{print $11}')" )" && pwd )"
-#cd $ZED_DIR
-echo "Using $ZED_DIR as root for ZED scripts..."
 
 #
 # Directory specifications
 #
 export CURDIR=$ZED_TARGET_DIR/
-export SCRIPTS="$ZED_DIR/.zed"
+export SCRIPTS="${ZED_DIR}/zed/.zed"
 export ZED_CONFIG=${CURDIR}config
+
+echo "Using $ZED_DIR/.zed as root for ZED scripts..."
 
 #
 # Includes
