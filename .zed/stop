@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "Stopping $DOCKER_NAME..."
+echo "Stopping $CONTAINER_NAME..."
 
 docker stop $CONTAINER_NAME
