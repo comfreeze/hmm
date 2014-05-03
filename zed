@@ -10,13 +10,17 @@ echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput se
 # Expects to always run at home
 #
 export ZED_TARGET_DIR=$( pwd )
-export ZED_DIR="$( cd "$( dirname "$( ls -l ${BASH_SOURCE[0]} | awk '{print $11}')" )" && pwd )"
+ZED_DIR="$( cd "$( dirname "$( ls -l ${BASH_SOURCE[0]} | awk '{print $11}')" )" && pwd )"
+if [ -d "$ZED_DIR/zed" ]; then
+ ZED_DIR="$ZED_DIR/zed"
+fi
+export ZED_DIR
 
 #
 # Directory specifications
 #
 export CURDIR=$ZED_TARGET_DIR/
-export SCRIPTS="${ZED_DIR}/zed/.zed"
+export SCRIPTS="${ZED_DIR}/.zed"
 export ZED_CONFIG=${CURDIR}config
 
 echo "Using $ZED_DIR/.zed as root for ZED scripts..."
