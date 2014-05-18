@@ -28,9 +28,9 @@ echo "Using $ZED_DIR/.zed as root for ZED scripts..."
 #
 # Includes
 #
-if [ -f $ZED_CONFIG ]; then
+if [ -f "$ZED_CONFIG" ]; then
 	echo "Using config $ZED_CONFIG..."
-	source $ZED_CONFIG
+	source "$ZED_CONFIG"
 fi
 
 #
