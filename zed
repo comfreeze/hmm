@@ -164,7 +164,7 @@ while test $# -gt 0; do
 done
 
 if [ "$ACTION" != "" ]; then
-	/bin/bash $ACTION $*
+	/bin/bash "$ACTION" $*
 	exit 0
 fi
 
