@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "Committing $CONTAINER_NAME..."
 
-docker commit $CONTAINER_NAME $DOCKER_NAME-snapshot
+$DOCKER_CMD commit $CONTAINER_NAME $DOCKER_NAME-snapshot

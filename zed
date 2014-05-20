@@ -2,6 +2,15 @@
 VERSION=0.0.1
 
 #
+# Alias new versions hack
+#
+if [ -f "/usr/bin/docker.io" ]; then
+ export DOCKER_CMD="docker.io"
+else
+ export DOCKER_CMD="docker"
+fi
+
+#
 # ComFreeze - zed
 #
 echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"

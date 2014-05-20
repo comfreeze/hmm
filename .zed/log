@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "Stopping $DOCKER_NAME..."
 
-docker logs $* $CONTAINER_NAME
+$DOCKER_CMD logs $* $CONTAINER_NAME
