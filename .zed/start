@@ -3,7 +3,7 @@ echo "Launching $DOCKER_NAME with args:"
 echo $CONTAINER_ARGS
 echo " "
 
-docker run \
+$DOCKER_CMD run \
  -i -t -d \
  --name=$CONTAINER_NAME \
  $CONTAINER_ARGS \

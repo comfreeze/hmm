@@ -3,6 +3,6 @@ echo "Attaching to $DOCKER_NAME with args:"
 echo $CONTAINER_ARGS
 echo " "
 
-docker attach \
+$DOCKER_CMD attach \
  $* \
  $DOCKER_NAME

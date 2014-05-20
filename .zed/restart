@@ -2,6 +2,6 @@
 echo "Starting $CONTAINER_NAME..."
 echo " "
 
-docker start \
+$DOCKER_CMD start \
  $* \
  $CONTAINER_NAME

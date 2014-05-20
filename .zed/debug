@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Debugging $DOCKER_NAME..."
 
-docker run \
+$DOCKER_CMD run \
  -i -t --rm \
  $CONTAINER_ARGS \
  $* \
