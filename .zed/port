@@ -1,6 +1,6 @@
 #!/bin/bash
-echo "Finding public port for $DOCKER_NAME - $1"
+echo "Finding public port for $CONTAINER_NAME - $1"
 
 PORT=`$DOCKER_CMD port $CONTAINER_NAME $1 | cut -d : -f 2`
 
-echo "Public port $1 = $DOCKER_NAME : $PORT"
+echo "Public port $1 = $CONTAINER_NAME : $PORT"
