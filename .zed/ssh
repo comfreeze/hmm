@@ -4,6 +4,8 @@ PORT=`$DOCKER_CMD port $CONTAINER_NAME 22 | cut -d : -f 2`
 echo "Remoting into $DOCKER_NAME - $PORT"
 
 ssh \
+ -o "LogLevel QUIET" \
+ -o "StrictHostKeyChecking no" \
  -o "UserKnownHostsFile /dev/null" \
  -p $PORT \
  comfreeze@localhost
