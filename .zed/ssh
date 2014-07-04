@@ -1,4 +1,6 @@
 #!/bin/bash
-echo "Remoting into $DOCKER_NAME - $CONTAINER_SSH"
+PORT=`$DOCKER_CMD port $CONTAINER_NAME 22 | cut -d : -f 2`
 
-ssh -p $CONTAINER_SSH comfreeze@localhost
+echo "Remoting into $DOCKER_NAME - $PORT"
+
+ssh -p $PORT comfreeze@localhost
