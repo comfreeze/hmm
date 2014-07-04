@@ -32,7 +32,7 @@ export CURDIR=$ZED_TARGET_DIR/
 export SCRIPTS="${ZED_DIR}/.zed"
 export ZED_CONFIG=${CURDIR}config
 
-echo "Using $ZED_DIR/.zed as root for ZED scripts..."
+#echo "Using $ZED_DIR/.zed as root for ZED scripts..."
 
 #
 # Includes
@@ -164,7 +164,7 @@ while test $# -gt 0; do
                 *)
 			if [[ -f "$SCRIPTS/$1" ]]; then
 				ACTION="$SCRIPTS/$1"
-				echo "ACTION: $ACTION"
+#				echo "ACTION: $ACTION"
 				shift
 			fi
                         break

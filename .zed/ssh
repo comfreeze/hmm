@@ -1,7 +1,7 @@
 #!/bin/bash
 PORT=`$DOCKER_CMD port $CONTAINER_NAME 22 | cut -d : -f 2`
 
-echo "Remoting into $DOCKER_NAME - $PORT"
+echo "Remoting into $CONTAINER_NAME - $PORT"
 
 ssh \
  -o "LogLevel QUIET" \
