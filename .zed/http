@@ -1,5 +1,5 @@
 #!/bin/bash
-PORT=`$DOCKER_CMD port $CONTAINER_NAME 80 | cut -d : -f 2`
+SRV_PORT=`$DOCKER_CMD port $CONTAINER_NAME 80 | cut -d : -f 2`
 
 echo "HTTP for $CONTAINER_NAME"
-echo "http://localhost:$PORT"
+echo "http://localhost:$SRV_PORT"
