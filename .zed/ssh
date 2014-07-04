@@ -3,4 +3,7 @@ PORT=`$DOCKER_CMD port $CONTAINER_NAME 22 | cut -d : -f 2`
 
 echo "Remoting into $DOCKER_NAME - $PORT"
 
-ssh -p $PORT comfreeze@localhost
+ssh \
+ -o "UserKnownHostsFile /dev/null" \
+ -p $PORT \
+ comfreeze@localhost
