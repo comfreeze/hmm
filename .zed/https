@@ -1,0 +1,5 @@
+#!/bin/bash
+PORT=`$DOCKER_CMD port $CONTAINER_NAME 443 | cut -d : -f 2`
+
+echo "HTTPS for $CONTAINER_NAME"
+echo "https://localhost:$PORT"
