@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "Inspecting $CONTAINER_NAME..."
 
-docker inspect $CONTAINER_NAME
+docker inspect $* $CONTAINER_NAME
