@@ -8,4 +8,4 @@ ssh \
  -o "StrictHostKeyChecking no" \
  -o "UserKnownHostsFile /dev/null" \
  -p $SRV_PORT \
- comfreeze@localhost
+ comfreeze@localhost $*
