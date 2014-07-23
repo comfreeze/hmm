@@ -31,15 +31,21 @@ export ZED_DIR
 export CURDIR=$ZED_TARGET_DIR/
 export SCRIPTS="${ZED_DIR}/.zed"
 export ZED_CONFIG=${CURDIR}config
+export ZED_LOCAL_CONFIG=${CURDIR}local.config
 
 #echo "Using $ZED_DIR/.zed as root for ZED scripts..."
 
 #
 # Includes
 #
-if [ -f "$ZED_CONFIG" ]; then
-	echo "Using config $ZED_CONFIG..."
-	source "$ZED_CONFIG"
+if [ -f "$ZED_LOCAL_CONFIG" ]; then
+	echo "Using local config $ZED_LOCAL_CONFIG"
+	source "$ZED_LOCAL_CONFIG"
+else
+	if [ -f "$ZED_CONFIG" ]; then
+		echo "Using config $ZED_CONFIG..."
+		source "$ZED_CONFIG"
+	fi
 fi
 
 #
