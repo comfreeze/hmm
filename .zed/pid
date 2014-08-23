@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "Looking up PID for $DOCKER_NAME..."
+
+$DOCKER_CMD inspect --format {{.State.Pid}} $DOCKER_NAME
