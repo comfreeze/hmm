@@ -1,0 +1,6 @@
+#!/bin/bash
+echo "Finding current image for $CONTAINER_NAME"
+
+IMAGE=`$DOCKER_CMD inspect -f {{.Image}} $CONTAINER_NAME | cut -d : -f 2`
+
+echo "$IMAGE"

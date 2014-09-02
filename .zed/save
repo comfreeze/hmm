@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "Saving $CONTAINER_NAME..."
+
+IMAGE=`$DOCKER_CMD inspect -f {{.Image}} $CONTAINER_NAME | cut -d : -f 2`
+OUTPUT=${1-$CONTAINER_NAME-snapshot.tar}
+
+echo "$DOCKER_CMD save -o $OUTPUT $IMAGE"
+$DOCKER_CMD save -o $OUTPUT $IMAGE

@@ -1,4 +1,6 @@
 #!/bin/bash
 echo "Committing $CONTAINER_NAME..."
 
-$DOCKER_CMD commit $CONTAINER_NAME $DOCKER_NAME-snapshot
+OUTPUT=${1-$DOCKER_NAME-snapshot}
+
+$DOCKER_CMD commit $CONTAINER_NAME $OUTPUT
