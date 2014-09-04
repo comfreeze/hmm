@@ -19,7 +19,8 @@ echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput se
 # Expects to always run at home
 #
 export ZED_TARGET_DIR=$( pwd )
-ZED_DIR="$( cd "$( dirname "$( ls -l ${BASH_SOURCE[0]} | awk '{print $11}')" )" && pwd )"
+ZED_DIR=$( dirname "${BASH_SOURCE[0]}" )
+echo "ZED_DIR=$ZED_DIR"
 if [ -d "$ZED_DIR/zed" ]; then
  ZED_DIR="$ZED_DIR/zed"
 fi
@@ -33,6 +34,7 @@ export SCRIPTS="${ZED_DIR}/.zed"
 export ZED_CONFIG=${CURDIR}config
 export ZED_LOCAL_CONFIG=${CURDIR}local.config
 
+echo "SCRIPTS=$SCRIPTS"
 #echo "Using $ZED_DIR/.zed as root for ZED scripts..."
 
 #
@@ -158,11 +160,13 @@ while test $# -gt 0; do
 			exit 0
 			;;
 		-a|--actions)
+			cd $SCRIPTS/
 			echo "Available actions:"
-			for ACTION_FILE in $SCRIPTS/*
+			for ACTION_FILE in *
 			do
 				echo " * ${ACTION_FILE/$SCRIPTS\//}"
 			done
+			cd $CURDIR
 			shift
 			;;
                 *)
