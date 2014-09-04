@@ -158,13 +158,11 @@ while test $# -gt 0; do
 			exit 0
 			;;
 		-a|--actions)
-			cd $SCRIPTS
 			echo "Available actions:"
-			for ACTION_FILE in *
+			for ACTION_FILE in $SCRIPTS/*
 			do
-				echo " * ${ACTION_FILE}"
+				echo " * ${ACTION_FILE/$SCRIPTS\//}"
 			done
-			cd $CURDIR
 			shift
 			;;
                 *)
