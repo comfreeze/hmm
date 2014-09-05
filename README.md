@@ -32,11 +32,11 @@ ln -s ~/Downloads/hmm ~/bin/purple-people-eater
 
 To get started using HMM, make sure you're in a shell in a directory with a '''Dockerfile''' and '''config''' file.
 
-REGISTRY   | Home registry to manage this configs images (ie. docker.org)
-BASE       | Base image name in the registry (ie. ubuntu)
-BRANCH     | Branch name from base image (ie. 14.04)
-ENV_VARS   | Environment variables to inject (ie. -f ENV=dev)
-VOLUMES    | Volumes to link/mount (ie. -v /home/me/stuff:/inside/dir)
-PORTS      | Ports to forward/manage (ie. -p 8181:80)
+* REGISTRY   | Home registry to manage this configs images (ie. docker.org)
+* BASE       | Base image name in the registry (ie. ubuntu)
+* BRANCH     | Branch name from base image (ie. 14.04)
+* ENV_VARS   | Environment variables to inject (ie. -f ENV=dev)
+* VOLUMES    | Volumes to link/mount (ie. -v /home/me/stuff:/inside/dir)
+* PORTS      | Ports to forward/manage (ie. -p 8181:80)
 
 For more information once running, use '''''hmm --help''''' for runtime information.
