@@ -10,17 +10,13 @@ else
  export DOCKER_CMD="docker"
 fi
 
-#
-# ComFreeze - zed
-#
-echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
 
 #
 # Expects to always run at home
 #
 export ZED_TARGET_DIR=$( pwd )
 ZED_DIR=$( dirname "${BASH_SOURCE[0]}" )
-echo "ZED_DIR=$ZED_DIR"
+#echo "ZED_DIR=$ZED_DIR"
 if [ -d "$ZED_DIR/zed" ]; then
  ZED_DIR="$ZED_DIR/zed"
 fi
@@ -31,24 +27,12 @@ export ZED_DIR
 #
 export CURDIR=$ZED_TARGET_DIR/
 export SCRIPTS="${ZED_DIR}/.zed"
-export ZED_CONFIG=${CURDIR}config
-export ZED_LOCAL_CONFIG=${CURDIR}local.config
+export ZED_CONFIG=${CURDIR}config.zed
+export ZED_LOCAL_CONFIG=${CURDIR}local.zed
+export ZED_CONTROL="nsenter"
 
-echo "SCRIPTS=$SCRIPTS"
+#echo "SCRIPTS=$SCRIPTS"
 #echo "Using $ZED_DIR/.zed as root for ZED scripts..."
-
-#
-# Includes
-#
-if [ -f "$ZED_LOCAL_CONFIG" ]; then
-	echo "Using local config $ZED_LOCAL_CONFIG"
-	source "$ZED_LOCAL_CONFIG"
-else
-	if [ -f "$ZED_CONFIG" ]; then
-		echo "Using config $ZED_CONFIG..."
-		source "$ZED_CONFIG"
-	fi
-fi
 
 #
 # Parameters
@@ -59,7 +43,7 @@ while test $# -gt 0; do
 			shift
 			if test $# -gt 0; then
 				echo "Setting $1"
-				PORTS="${PORTS} -p $1"
+				ADD_PORTS="${ADD_PORTS} -p $1"
 			else
 				echo "No port specified"
 				exit 1
@@ -68,14 +52,14 @@ while test $# -gt 0; do
 			;;
 		--port*)
 			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			PORTS="$PORTS -p $DATA"
+			ADD_PORTS="$ADD_PORTS -p $DATA"
 			shift
 			;;
 		-v)
 			shift
 			if test $# -gt 0; then
 				echo "Setting $1"
-				VOLUMES="${VOLUMES} -v $1"
+				ADD_VOLUMES="${ADD_VOLUMES} -v $1"
 			else
 				echo "No port specified"
 				exit 1
@@ -84,14 +68,14 @@ while test $# -gt 0; do
 			;;
 		--vol*)
 			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			VOLUMES="$VOLUMES -v $DATA"
+			ADD_VOLUMES="$ADD_VOLUMES -v $DATA"
 			shift
 			;;
 		-e)
 			shift
 			if test $# -gt 0; then
 				echo "Setting $1"
-				ENV_VARS="${ENV_VARS} -e $1"
+				ADD_ENV_VARS="${ADD_ENV_VARS} -e $1"
 			else
 				echo "No var specified"
 				exit 1
@@ -100,7 +84,19 @@ while test $# -gt 0; do
 			;;
 		--env*)
 			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			ENV_VARS="$ENV_VARS -e $DATA"
+			ADD_ENV_VARS="$ADD_ENV_VARS -e $DATA"
+			shift
+			;;
+		--config)
+			shift
+			ZED_CONFIG=$1
+			#echo "Using config: $ZED_CONFIG"
+			shift
+			;;
+		-c)
+			shift
+			ZED_CONTROL=$1
+			echo "Using control: $ZED_CONTROL"
 			shift
 			;;
 		*)
@@ -108,6 +104,26 @@ while test $# -gt 0; do
 			;;
 	esac
 done
+
+#
+# Includes
+#
+if [ -f "$ZED_LOCAL_CONFIG" ]; then
+#	echo "Using local config $ZED_LOCAL_CONFIG"
+	source "$ZED_LOCAL_CONFIG"
+else
+	if [ -f "$ZED_CONFIG" ]; then
+#		echo "Using config $ZED_CONFIG..."
+		source "$ZED_CONFIG"
+	else
+		echo "No configuration!"
+		exit 1
+	fi
+fi
+
+PORTS="$PORTS $ADD_PORTS"
+VOLUMES="$VOLUMES $ADD_VOLUMES"
+ENV_VARS="$ENV_VARS $ADD_ENV_VARS"
 
 #
 # Fully qualified name:
@@ -120,6 +136,11 @@ export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${RE
 # e.g. my-cool-server-3.0
 #
 export CONTAINER_NAME="$REPOSITORY-$TAG"
+
+if [[ $CONTAINER_NAME = "-" ]]; then
+	echo "Invalid configuration!"
+	exit 1
+fi
 
 #
 # Compiled launch parameters:
@@ -135,6 +156,7 @@ export CONTAINER_SSH="$SSH_PORT"
 while test $# -gt 0; do
 	case "$1" in
 		-h|--help)
+			echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
 			echo "zed - helper with docker container tooling"
 			echo " "
 			echo "zed [feature] [params] action [options]"
@@ -151,6 +173,9 @@ while test $# -gt 0; do
 			exit 0
 			;;
 		-i|--info)
+			echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
+			echo "ZED_DIR:        $ZED_DIR"
+			echo "ZED_CONFIG:     $ZED_CONFIG"
 			echo "REGISTRY:       $REGISTRY"
 			echo "REPOSITORY:     $REPOSITORY"
 			echo "TAG:            $TAG"
@@ -160,6 +185,7 @@ while test $# -gt 0; do
 			exit 0
 			;;
 		-a|--actions)
+			echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
 			cd $SCRIPTS/
 			echo "Available actions:"
 			for ACTION_FILE in *
