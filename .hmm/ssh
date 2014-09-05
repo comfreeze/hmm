@@ -1,12 +1,7 @@
 #!/bin/bash
-SRV_PORT=`$DOCKER_CMD port $CONTAINER_NAME 22 | cut -d : -f 2`
+container_port 22
+PORT=$RETURN_HOLDER
 
-echo "Remoting into $CONTAINER_NAME - $SRV_PORT"
+verbose "Remoting into $CONTAINER_NAME - $PORT"
 
-ssh \
- -t \
- -o "LogLevel QUIET" \
- -o "StrictHostKeyChecking no" \
- -o "UserKnownHostsFile /dev/null" \
- -p $SRV_PORT \
- comfreeze@localhost $*
+ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT comfreeze@localhost $*

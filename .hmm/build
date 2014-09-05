@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "Building $DOCKER_NAME..."
+verbose "Building $DOCKER_NAME..."
 
 $DOCKER_CMD build $* -t $DOCKER_NAME .

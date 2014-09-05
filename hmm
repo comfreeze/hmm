@@ -1,6 +1,7 @@
 #!/bin/bash
 VERSION=0.1.0
-VERBOSE=0
+VERBOSE=false
+RETURN_HOLDER=
 
 #
 # Colorful ASCII sig - Just cause bubb
@@ -33,31 +34,71 @@ usage() {
 # Verbosity helper
 #
 verbose() {
-    [ $VERBOSE > 0 ] || echo $1
+    if [[ $VERBOSE = true ]]; then
+        echo $1
+    fi
 }
+#
+# Test configuration
+#
+check() {
+    if [[ $CONTAINER_NAME = "-" ]]; then
+        echo "ERROR: Invalid configuration!"
+        usage
+        exit 1
+    fi
+}
+#
+# PID Lookup
+#
+container_pid() {
+    RESULT=$( $DOCKER_CMD inspect --format {{.State.Pid}} $CONTAINER_NAME )
+    RETURN_HOLDER=$RESULT
+    return
+}
+#
+# PORT Lookup
+#
+container_port() {
+    RESULT=$( $DOCKER_CMD port $CONTAINER_NAME $1 | cut -d : -f 2 )
+    RETURN_HOLDER=$RESULT
+    return
+}
+#
+# Export functions to children
+#
+export -f signature
+export -f usage
+export -f verbose
+export -f check
+export -f container_pid
+export -f container_port
 
 #
 # Command references
 # Alias new versions hack
 #
 if [ -f "/usr/bin/docker.io" ]; then
- export DOCKER_CMD="docker.io"
+ DOCKER_CMD="docker.io"
 else
- export DOCKER_CMD="docker"
+ DOCKER_CMD="docker"
 fi
 export GIT_CMD="git"
+export DOCKER_CMD
 
 #
 # Directory specifications:
 # Always operates on current directory
 #
-export ZED_TARGET_DIR=$( pwd )
-export ZED_DIR=$( dirname "${BASH_SOURCE[0]}" )
-export CURDIR=$ZED_TARGET_DIR/
-export SCRIPTS="${ZED_DIR}/.hmm"
-export ZED_CONFIG=${CURDIR}config.hmm
-export ZED_LOCAL_CONFIG=${CURDIR}local.hmm
-export ZED_CONTROL="nsenter"
+export HMM_TARGET_DIR=$( pwd )
+export HMM_DIR=$( dirname "${BASH_SOURCE[0]}" )
+export CURDIR=$HMM_TARGET_DIR/
+export SCRIPTS="${HMM_DIR}/.hmm"
+export HMM_CONFIG=${CURDIR}config.hmm
+export HMM_LOCAL_CONFIG=${CURDIR}local.hmm
+export HMM_CONTROL="nsenter"
+export VERBOSE
+export RETURN_HOLDER
 
 #
 # Parameters
@@ -116,19 +157,19 @@ while test $# -gt 0; do
 			shift
 			;;
 	    --verbose)
-	        VERBOSE=1
+	        VERBOSE=true
 	        shift
 	        ;;
 		--config)
 			shift
-			ZED_CONFIG=$1
-			verbose "Using config: $ZED_CONFIG"
+			HMM_CONFIG=$1
+			verbose "Using config: $HMM_CONFIG"
 			shift
 			;;
 		-c)
 			shift
-			ZED_CONTROL=$1
-			verbose "Using control: $ZED_CONTROL"
+			HMM_CONTROL=$1
+			verbose "Using control: $HMM_CONTROL"
 			shift
 			;;
 		*)
@@ -137,20 +178,20 @@ while test $# -gt 0; do
 	esac
 done
 
-verbose "ZED_DIR=$ZED_DIR"
+verbose "HMM_DIR=$HMM_DIR"
 verbose "SCRIPTS=$SCRIPTS"
-verbose "Using $ZED_DIR/.hmm as root for ZED scripts..."
+verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
 
 #
 # Includes
 #
-if [ -f "$ZED_LOCAL_CONFIG" ]; then
-	verbose "Using local config $ZED_LOCAL_CONFIG"
-	source "$ZED_LOCAL_CONFIG"
+if [ -f "$HMM_LOCAL_CONFIG" ]; then
+	verbose "Using local config $HMM_LOCAL_CONFIG"
+	source "$HMM_LOCAL_CONFIG"
 else 
-	if [ -f "$ZED_CONFIG" ]; then
-		verbose "Using config $ZED_CONFIG..."
-		source "$ZED_CONFIG"
+	if [ -f "$HMM_CONFIG" ]; then
+		verbose "Using config $HMM_CONFIG..."
+		source "$HMM_CONFIG"
 	fi
 fi
 
@@ -191,8 +232,8 @@ while test $# -gt 0; do
 			;;
 		-i|--info)
 			signature
-			echo "ZED_DIR:        $ZED_DIR"
-			echo "ZED_CONFIG:     $ZED_CONFIG"
+			echo "HMM_DIR:        $HMM_DIR"
+			echo "HMM_CONFIG:     $HMM_CONFIG"
 			echo "REGISTRY:       $REGISTRY"
 			echo "BASE:           $BASE"
 			echo "TAG:            $TAG"
@@ -213,11 +254,6 @@ while test $# -gt 0; do
 			shift
 			;;
         *)
-			if [[ $CONTAINER_NAME = "-" ]]; then
-				echo "ERROR: Invalid configuration!"
-				usage
-				exit 1
-			fi
 			if [[ -f "$SCRIPTS/$1" ]]; then
 				ACTION="$SCRIPTS/$1"
 				verbose "ACTION: $ACTION"
@@ -230,7 +266,7 @@ done
 
 if [ "$ACTION" != "" ]; then
 	/bin/bash "$ACTION" $*
-	exit 0
+#	exit 0
 else
 	usage
 	exit 0

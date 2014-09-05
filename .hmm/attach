@@ -1,8 +1,4 @@
 #!/bin/bash
-echo "Attaching to $DOCKER_NAME with args:"
-echo $CONTAINER_ARGS
-echo " "
+verbose "Attaching to $DOCKER_NAME with args: $CONTAINER_ARGS"
 
-$DOCKER_CMD attach \
- $* \
- $DOCKER_NAME
+$DOCKER_CMD attach $* $DOCKER_NAME

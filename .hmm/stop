@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "Stopping $CONTAINER_NAME..."
+verbose "Stopping $CONTAINER_NAME..."
 
 $DOCKER_CMD stop $CONTAINER_NAME

@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Installing ZED"
+verbose "Installing HMM"
 
 pathadd() {
     if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
@@ -16,16 +16,10 @@ fi
 
 cd ~/bin
 
-# Fix quirky references
-ZED=$ZED_DIR/zed
-if [ -d "$ZED" ]; then
- ZED="$ZED/zed"
-fi
-
 if [ ! -f "zed" ]; then
- echo "Creating link in ~/bin"
- /bin/ln -s $ZED zed
+ verbose "Creating link in ~/bin"
+ /bin/ln -s $HMM zed
 else
- echo "Existing link intact"
+ verbose "Existing link intact"
 fi
 

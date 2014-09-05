@@ -1,4 +1,6 @@
 #!/bin/bash
-echo "Looking up PID for $DOCKER_NAME..."
+verbose "Looking up PID for $CONTAINER_NAME..."
 
-$DOCKER_CMD inspect --format {{.State.Pid}} $DOCKER_NAME
+container_pid
+PID=$RETURN_HOLDER
+echo $PID

@@ -1,11 +1,4 @@
 #!/bin/bash
-echo "Launching $DOCKER_NAME with args:"
-echo $CONTAINER_ARGS
-echo " "
+verbose "Launching $DOCKER_NAME with args: $CONTAINER_ARGS"
 
-$DOCKER_CMD run \
- -i -t -d \
- --name=$CONTAINER_NAME \
- $CONTAINER_ARGS \
- $* \
- $DOCKER_NAME
+$DOCKER_CMD run -i -t -d --name=$CONTAINER_NAME $CONTAINER_ARGS $* $DOCKER_NAME

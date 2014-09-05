@@ -1,7 +1,4 @@
 #!/bin/bash
-echo "Starting $CONTAINER_NAME..."
-echo " "
+verbose "Starting $CONTAINER_NAME..."
 
-$DOCKER_CMD start \
- $* \
- $CONTAINER_NAME
+$DOCKER_CMD start $* $CONTAINER_NAME

@@ -1,5 +1,5 @@
 #!/bin/bash
-SRV_PORT=`$DOCKER_CMD port $CONTAINER_NAME 80 | cut -d : -f 2`
-
-echo "HTTP for $CONTAINER_NAME"
-echo "http://localhost:$SRV_PORT"
+container_port 80
+PORT=$RETURN_HOLDER
+verbose "http://localhost:$PORT"
+echo $PORT

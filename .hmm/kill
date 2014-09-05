@@ -1,6 +1,5 @@
 #!/bin/bash
-echo "Killing $CONTAINER_NAME..."
+verbose "Killing $CONTAINER_NAME..."
 
 $DOCKER_CMD stop $CONTAINER_NAME
-
 $DOCKER_CMD rm $CONTAINER_NAME

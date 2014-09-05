@@ -22,14 +22,14 @@ hmm -a
 
 The configuration file found or specified should provide values from the following table to customize as needed:
 
-Variable      | Usage         | Example
-------------- | ------------- | -------------
- REGISTRY     | Home registry to manage this configs images | docker.org
- BASE         | Base image name in the registry | ubuntu
- BRANCH       | Branch name from base image | 14.04
- ENV_VARS     | Environment variables to inject | -f ENV=dev
- VOLUMES      | Volumes to link/mount | -v /home/me/stuff:/inside/dir
- PORTS        | Ports to forward/manage | -p 8181:80
+Variable      | Usage                                        | Example
+------------- | -------------------------------------------- | -------------
+ REGISTRY     | Home registry to manage this configs images  | docker.org
+ BASE         | Base image name in the registry              | ubuntu
+ BRANCH       | Branch name from base image                  | 14.04
+ ENV_VARS     | Environment variables to inject              | -e ENV=dev -e ANOTHER=1500
+ VOLUMES      | Volumes to link/mount                        | -v /home/me/stuff:/inside/dir -v /inside/exposed
+ PORTS        | Ports to forward/manage                      | -p 8181:80 -p 33066:3306 -p 22
 
 These elements are referenced through the **HMM** script system and will provide universal simplicity throughout.  To verify that your configuration file is being used, you can use the *info* option (see -i)
 
