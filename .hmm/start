@@ -1,0 +1,11 @@
+#!/bin/bash
+echo "Launching $DOCKER_NAME with args:"
+echo $CONTAINER_ARGS
+echo " "
+
+$DOCKER_CMD run \
+ -i -t -d \
+ --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $* \
+ $DOCKER_NAME

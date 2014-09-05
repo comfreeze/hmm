@@ -1,0 +1,12 @@
+#!/bin/bash
+SRV_PORT=`$DOCKER_CMD port $CONTAINER_NAME 22 | cut -d : -f 2`
+
+echo "Remoting into $CONTAINER_NAME - $SRV_PORT"
+
+ssh \
+ -t \
+ -o "LogLevel QUIET" \
+ -o "StrictHostKeyChecking no" \
+ -o "UserKnownHostsFile /dev/null" \
+ -p $SRV_PORT \
+ comfreeze@localhost $*

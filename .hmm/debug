@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "Debugging $DOCKER_NAME..."
+
+$DOCKER_CMD run \
+ -i -t --rm \
+ $CONTAINER_ARGS \
+ $* \
+ $DOCKER_NAME \
+ /bin/bash

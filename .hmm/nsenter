@@ -1,0 +1,13 @@
+#!/bin/bash
+PID=$($DOCKER_CMD inspect --format {{.State.Pid}} $CONTAINER_NAME)
+
+echo "Entering namespace for $CONTAINER_NAME (PID: $PID)"
+
+nsenter \
+ --target $PID \
+ --mount \
+ --uts \
+ --ipc \
+ --net \
+ --pid \
+ $*

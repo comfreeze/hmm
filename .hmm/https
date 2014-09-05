@@ -1,0 +1,5 @@
+#!/bin/bash
+SRV_PORT=`$DOCKER_CMD port $CONTAINER_NAME 443 | cut -d : -f 2`
+
+echo "HTTPS for $CONTAINER_NAME"
+echo "https://localhost:$SRV_PORT"
