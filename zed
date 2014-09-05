@@ -139,10 +139,6 @@ else
 	if [ -f "$ZED_CONFIG" ]; then
 #		echo "Using config $ZED_CONFIG..."
 		source "$ZED_CONFIG"
-	else
-		echo "ERROR: No configuration!"
-		usage
-		exit 1
 	fi
 fi
 
@@ -161,12 +157,6 @@ export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${RE
 # e.g. my-cool-server-3.0
 #
 export CONTAINER_NAME="$REPOSITORY-$TAG"
-
-if [[ $CONTAINER_NAME = "-" ]]; then
-	echo "ERROR: Invalid configuration!"
-	usage
-	exit 1
-fi
 
 #
 # Compiled launch parameters:
@@ -215,6 +205,11 @@ while test $# -gt 0; do
 			shift
 			;;
                 *)
+			if [[ $CONTAINER_NAME = "-" ]]; then
+				echo "ERROR: Invalid configuration!"
+				usage
+				exit 1
+			fi
 			if [[ -f "$SCRIPTS/$1" ]]; then
 				ACTION="$SCRIPTS/$1"
 #				echo "ACTION: $ACTION"
@@ -227,6 +222,9 @@ done
 
 if [ "$ACTION" != "" ]; then
 	/bin/bash "$ACTION" $*
+	exit 0
+else
+	usage
 	exit 0
 fi
 
