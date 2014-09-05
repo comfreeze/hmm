@@ -1,4 +1,0 @@
-#!/bin/bash
-echo "Inspecting $CONTAINER_NAME..."
-
-$DOCKER_CMD inspect $* $CONTAINER_NAME

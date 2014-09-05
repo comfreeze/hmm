@@ -1,7 +1,0 @@
-#!/bin/bash
-echo "Starting $CONTAINER_NAME..."
-echo " "
-
-$DOCKER_CMD start \
- $* \
- $CONTAINER_NAME

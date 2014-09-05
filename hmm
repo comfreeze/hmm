@@ -5,15 +5,15 @@ VERSION=0.1.0
 # Colorful ASCII sig - Just cause bubb
 #
 signature() {
-	echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
+	echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)H$(tput sgr0)eadworks $(tput setaf 1)M$(tput sgr0)achination $(tput setaf 1)M$(tput sgr0)anagement$(tput sgr0) - v$VERSION"
 }
 #
 # Help and usage (early to show for errors)
 #
 usage() {
-	echo "zed - helper with docker container tooling"
+	echo "hmm - helper with docker container tooling"
 	echo " "
-	echo "zed [feature] [params] action [options]"
+	echo "hmm [feature] [params] action [options]"
 	echo " "
 	echo " FEATURES: "
 	echo "   -a, --actions       Show complete list of available actions"
@@ -25,7 +25,7 @@ usage() {
 	echo "   -e NAME=value       Define an internal environment variable"
 	echo "   -p (###:)###        Tunnel a port through the container [host:container]"
 	echo "   -v (/path:)/path    Mount a virtual volume into the container [host:container]"
-	echo "   --config (filename) Direct configuration file specification (default: config.zed)"
+	echo "   --config (filename) Direct configuration file specification (default: config.hmm)"
 }
 
 #
@@ -44,8 +44,8 @@ fi
 export ZED_TARGET_DIR=$( pwd )
 ZED_DIR=$( dirname "${BASH_SOURCE[0]}" )
 #echo "ZED_DIR=$ZED_DIR"
-if [ -d "$ZED_DIR/zed" ]; then
- ZED_DIR="$ZED_DIR/zed"
+if [ -d "$ZED_DIR/hmm" ]; then
+ ZED_DIR="$ZED_DIR/hmm"
 fi
 export ZED_DIR
 
@@ -53,13 +53,13 @@ export ZED_DIR
 # Directory specifications
 #
 export CURDIR=$ZED_TARGET_DIR/
-export SCRIPTS="${ZED_DIR}/.zed"
-export ZED_CONFIG=${CURDIR}config.zed
-export ZED_LOCAL_CONFIG=${CURDIR}local.zed
+export SCRIPTS="${ZED_DIR}/.hmm"
+export ZED_CONFIG=${CURDIR}config.hmm
+export ZED_LOCAL_CONFIG=${CURDIR}local.hmm
 export ZED_CONTROL="nsenter"
 
 #echo "SCRIPTS=$SCRIPTS"
-#echo "Using $ZED_DIR/.zed as root for ZED scripts..."
+#echo "Using $ZED_DIR/.hmm as root for ZED scripts..."
 
 #
 # Parameters

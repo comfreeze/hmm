@@ -1,6 +1,0 @@
-#!/bin/bash
-echo "Finding public port for $CONTAINER_NAME - $1"
-
-SRV_PORT=`$DOCKER_CMD port $CONTAINER_NAME $1 | cut -d : -f 2`
-
-echo "Public port $1 = $CONTAINER_NAME : $SRV_PORT"

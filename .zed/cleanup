@@ -1,4 +1,0 @@
-#!/bin/bash
-echo "Destroying $CONTAINER_NAME..."
-
-$DOCKER_CMD rm $CONTAINER_NAME

@@ -1,4 +1,0 @@
-#!/bin/bash
-echo "Pushing $DOCKER_NAME..."
-
-$DOCKER_CMD push $DOCKER_NAME

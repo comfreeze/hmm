@@ -1,4 +1,0 @@
-#!/bin/bash
-echo "Pulling $DOCKER_NAME..."
-
-$DOCKER_CMD pull $DOCKER_NAME
