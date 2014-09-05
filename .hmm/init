@@ -1,4 +1,16 @@
 #!/bin/bash
-echo "Building $DOCKER_NAME..."
+echo "Initializing local directory for hmm..."
 
-$DOCKER_CMD build $* -t $DOCKER_NAME .
+#
+# Initialize configuration file
+#
+if [ -f "$ZED_CONFIG" ]; then
+cat << EOF
+REGISTRY="dockers.comfreeze.net:443"
+BASE="ubuntu"
+TAG=""
+ENV_VARS=""
+VOLUMES=""
+PORTS=""
+EOF > $ZED_CONFIG
+fi

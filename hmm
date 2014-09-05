@@ -1,5 +1,6 @@
 #!/bin/bash
 VERSION=0.1.0
+VERBOSE=0
 
 #
 # Colorful ASCII sig - Just cause bubb
@@ -25,10 +26,18 @@ usage() {
 	echo "   -e NAME=value       Define an internal environment variable"
 	echo "   -p (###:)###        Tunnel a port through the container [host:container]"
 	echo "   -v (/path:)/path    Mount a virtual volume into the container [host:container]"
+	echo "   --verbose           Enable debug messaging"
 	echo "   --config (filename) Direct configuration file specification (default: config.hmm)"
+}
+#
+# Verbosity helper
+#
+verbose() {
+    [ $VERBOSE > 0 ] || echo $1
 }
 
 #
+# Command references
 # Alias new versions hack
 #
 if [ -f "/usr/bin/docker.io" ]; then
@@ -36,30 +45,19 @@ if [ -f "/usr/bin/docker.io" ]; then
 else
  export DOCKER_CMD="docker"
 fi
-
+export GIT_CMD="git"
 
 #
-# Expects to always run at home
+# Directory specifications:
+# Always operates on current directory
 #
 export ZED_TARGET_DIR=$( pwd )
-ZED_DIR=$( dirname "${BASH_SOURCE[0]}" )
-#echo "ZED_DIR=$ZED_DIR"
-if [ -d "$ZED_DIR/hmm" ]; then
- ZED_DIR="$ZED_DIR/hmm"
-fi
-export ZED_DIR
-
-#
-# Directory specifications
-#
+export ZED_DIR=$( dirname "${BASH_SOURCE[0]}" )
 export CURDIR=$ZED_TARGET_DIR/
 export SCRIPTS="${ZED_DIR}/.hmm"
 export ZED_CONFIG=${CURDIR}config.hmm
 export ZED_LOCAL_CONFIG=${CURDIR}local.hmm
 export ZED_CONTROL="nsenter"
-
-#echo "SCRIPTS=$SCRIPTS"
-#echo "Using $ZED_DIR/.hmm as root for ZED scripts..."
 
 #
 # Parameters
@@ -69,10 +67,10 @@ while test $# -gt 0; do
 		-p)
 			shift
 			if test $# -gt 0; then
-				echo "Setting $1"
+				verbose "Setting $1"
 				ADD_PORTS="${ADD_PORTS} -p $1"
 			else
-				echo "ERROR No port specified"
+				verbose "ERROR No port specified"
 				usage
 				exit 1
 			fi
@@ -86,10 +84,10 @@ while test $# -gt 0; do
 		-v)
 			shift
 			if test $# -gt 0; then
-				echo "Setting $1"
+				verbose "Setting $1"
 				ADD_VOLUMES="${ADD_VOLUMES} -v $1"
 			else
-				echo "ERROR: No port specified"
+				verbose "ERROR: No port specified"
 				usage
 				exit 1
 			fi
@@ -103,10 +101,10 @@ while test $# -gt 0; do
 		-e)
 			shift
 			if test $# -gt 0; then
-				echo "Setting $1"
+				verbose "Setting $1"
 				ADD_ENV_VARS="${ADD_ENV_VARS} -e $1"
 			else
-				echo "ERROR: No var specified"
+				verbose "ERROR: No var specified"
 				usage
 				exit 1
 			fi
@@ -117,16 +115,20 @@ while test $# -gt 0; do
 			ADD_ENV_VARS="$ADD_ENV_VARS -e $DATA"
 			shift
 			;;
+	    --verbose)
+	        VERBOSE=1
+	        shift
+	        ;;
 		--config)
 			shift
 			ZED_CONFIG=$1
-			#echo "Using config: $ZED_CONFIG"
+			verbose "Using config: $ZED_CONFIG"
 			shift
 			;;
 		-c)
 			shift
 			ZED_CONTROL=$1
-			echo "Using control: $ZED_CONTROL"
+			verbose "Using control: $ZED_CONTROL"
 			shift
 			;;
 		*)
@@ -135,15 +137,19 @@ while test $# -gt 0; do
 	esac
 done
 
+verbose "ZED_DIR=$ZED_DIR"
+verbose "SCRIPTS=$SCRIPTS"
+verbose "Using $ZED_DIR/.hmm as root for ZED scripts..."
+
 #
 # Includes
 #
 if [ -f "$ZED_LOCAL_CONFIG" ]; then
-#	echo "Using local config $ZED_LOCAL_CONFIG"
+	verbose "Using local config $ZED_LOCAL_CONFIG"
 	source "$ZED_LOCAL_CONFIG"
 else 
 	if [ -f "$ZED_CONFIG" ]; then
-#		echo "Using config $ZED_CONFIG..."
+		verbose "Using config $ZED_CONFIG..."
 		source "$ZED_CONFIG"
 	fi
 fi
@@ -156,13 +162,13 @@ ENV_VARS="$ENV_VARS $ADD_ENV_VARS"
 # Fully qualified name:
 # e.g. hostname.domain:port/repository:tag
 #
-export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${REPOSITORY}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )
+export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )
 
 #
 # Friendly name:
 # e.g. my-cool-server-3.0
 #
-export CONTAINER_NAME="$REPOSITORY-$TAG"
+export CONTAINER_NAME="$BASE-$TAG"
 
 #
 # Compiled launch parameters:
@@ -188,7 +194,7 @@ while test $# -gt 0; do
 			echo "ZED_DIR:        $ZED_DIR"
 			echo "ZED_CONFIG:     $ZED_CONFIG"
 			echo "REGISTRY:       $REGISTRY"
-			echo "REPOSITORY:     $REPOSITORY"
+			echo "BASE:           $BASE"
 			echo "TAG:            $TAG"
 			echo "DOCKER_NAME:    $DOCKER_NAME"
 			echo "CONTAINER_NAME: $CONTAINER_NAME"
@@ -206,7 +212,7 @@ while test $# -gt 0; do
 			cd $CURDIR
 			shift
 			;;
-                *)
+        *)
 			if [[ $CONTAINER_NAME = "-" ]]; then
 				echo "ERROR: Invalid configuration!"
 				usage
@@ -214,11 +220,11 @@ while test $# -gt 0; do
 			fi
 			if [[ -f "$SCRIPTS/$1" ]]; then
 				ACTION="$SCRIPTS/$1"
-#				echo "ACTION: $ACTION"
+				verbose "ACTION: $ACTION"
 				shift
 			fi
-                        break
-                        ;;
+            break
+            ;;
 	esac
 done
 
