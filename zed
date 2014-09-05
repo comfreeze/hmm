@@ -1,6 +1,12 @@
 #!/bin/bash
-VERSION=0.0.1
+VERSION=0.1.0
 
+#
+# Colorful ASCII sig - Just cause bubb
+#
+signature() {
+	echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
+}
 #
 # Help and usage (early to show for errors)
 #
@@ -135,7 +141,7 @@ done
 if [ -f "$ZED_LOCAL_CONFIG" ]; then
 #	echo "Using local config $ZED_LOCAL_CONFIG"
 	source "$ZED_LOCAL_CONFIG"
-else
+else 
 	if [ -f "$ZED_CONFIG" ]; then
 #		echo "Using config $ZED_CONFIG..."
 		source "$ZED_CONFIG"
@@ -166,10 +172,6 @@ export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
 
 export CONTAINER_SSH="$SSH_PORT"
 
-signature() {
-	echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
-
-}
 
 #
 # CLI User Interface
