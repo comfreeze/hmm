@@ -2,6 +2,27 @@
 VERSION=0.0.1
 
 #
+# Help and usage (early to show for errors)
+#
+usage() {
+	echo "zed - helper with docker container tooling"
+	echo " "
+	echo "zed [feature] [params] action [options]"
+	echo " "
+	echo " FEATURES: "
+	echo "   -a, --actions       Show complete list of available actions"
+	echo "   -h, --help          Show brief help"
+	echo "   -i, --info          Show defined contants"
+	echo " "
+	echo " PARAMS: "
+	echo "   -c (nsenter|ssh)    Select which control scheme to use in helper calls to the system."
+	echo "   -e NAME=value       Define an internal environment variable"
+	echo "   -p (###:)###        Tunnel a port through the container [host:container]"
+	echo "   -v (/path:)/path    Mount a virtual volume into the container [host:container]"
+	echo "   --config (filename) Direct configuration file specification (default: config.zed)"
+}
+
+#
 # Alias new versions hack
 #
 if [ -f "/usr/bin/docker.io" ]; then
@@ -45,7 +66,8 @@ while test $# -gt 0; do
 				echo "Setting $1"
 				ADD_PORTS="${ADD_PORTS} -p $1"
 			else
-				echo "No port specified"
+				echo "ERROR No port specified"
+				usage
 				exit 1
 			fi
 			shift
@@ -61,7 +83,8 @@ while test $# -gt 0; do
 				echo "Setting $1"
 				ADD_VOLUMES="${ADD_VOLUMES} -v $1"
 			else
-				echo "No port specified"
+				echo "ERROR: No port specified"
+				usage
 				exit 1
 			fi
 			shift
@@ -77,7 +100,8 @@ while test $# -gt 0; do
 				echo "Setting $1"
 				ADD_ENV_VARS="${ADD_ENV_VARS} -e $1"
 			else
-				echo "No var specified"
+				echo "ERROR: No var specified"
+				usage
 				exit 1
 			fi
 			shift
@@ -116,7 +140,8 @@ else
 #		echo "Using config $ZED_CONFIG..."
 		source "$ZED_CONFIG"
 	else
-		echo "No configuration!"
+		echo "ERROR: No configuration!"
+		usage
 		exit 1
 	fi
 fi
@@ -138,7 +163,8 @@ export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${RE
 export CONTAINER_NAME="$REPOSITORY-$TAG"
 
 if [[ $CONTAINER_NAME = "-" ]]; then
-	echo "Invalid configuration!"
+	echo "ERROR: Invalid configuration!"
+	usage
 	exit 1
 fi
 
@@ -150,30 +176,23 @@ export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
 
 export CONTAINER_SSH="$SSH_PORT"
 
+signature() {
+	echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
+
+}
+
 #
 # CLI User Interface
 #
 while test $# -gt 0; do
 	case "$1" in
 		-h|--help)
-			echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
-			echo "zed - helper with docker container tooling"
-			echo " "
-			echo "zed [feature] [params] action [options]"
-			echo " "
-			echo " FEATURES: "
-			echo "   -a, --actions                    Show complete list of available actions"
-			echo "   -h, --help                       Show brief help"
-			echo "   -i, --info                       Show defined contants"
-			echo " "
-			echo " PARAMS: "
-			echo "   -e NAME=value                    Define an internal environment variable"
-			echo "   -p (###:)###                     Tunnel a port through the container [host:container]"
-			echo "   -v (/path:)/path                 Mount a virtual volume into the container [host:container]"
+			signature
+			usage
 			exit 0
 			;;
 		-i|--info)
-			echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
+			signature
 			echo "ZED_DIR:        $ZED_DIR"
 			echo "ZED_CONFIG:     $ZED_CONFIG"
 			echo "REGISTRY:       $REGISTRY"
@@ -185,7 +204,7 @@ while test $# -gt 0; do
 			exit 0
 			;;
 		-a|--actions)
-			echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)Z$(tput sgr0)ero $(tput setaf 1)E$(tput sgr0)nergy $(tput setaf 1)D$(tput sgr0)ocker$(tput sgr0) - v$VERSION"
+			signature
 			cd $SCRIPTS/
 			echo "Available actions:"
 			for ACTION_FILE in *
