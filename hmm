@@ -23,12 +23,12 @@ usage() {
 	echo "   -i, --info          Show defined contants"
 	echo " "
 	echo " PARAMS: "
-	echo "   -c (nsenter|ssh)    Select which control scheme to use in helper calls to the system."
+	echo "   --control           (nsenter|ssh) Select which access to use in helper calls."
 	echo "   -e NAME=value       Define an internal environment variable"
 	echo "   -p (###:)###        Tunnel a port through the container [host:container]"
 	echo "   -v (/path:)/path    Mount a virtual volume into the container [host:container]"
 	echo "   --verbose           Enable debug messaging"
-	echo "   --config (filename) Direct configuration file specification (default: config.hmm)"
+	echo "   -c (filename) Direct configuration file specification (default: config.hmm)"
 }
 #
 # Verbosity helper
@@ -47,6 +47,12 @@ check() {
         usage
         exit 1
     fi
+}
+#
+# Test empty parameters
+#
+not_empty() {
+    [[ ! $1 = "" ]] || echo $2 && exit 1
 }
 #
 # PID Lookup
@@ -71,6 +77,7 @@ export -f signature
 export -f usage
 export -f verbose
 export -f check
+export -f not_empty
 export -f container_pid
 export -f container_port
 
@@ -160,13 +167,13 @@ while test $# -gt 0; do
 	        VERBOSE=true
 	        shift
 	        ;;
-		--config)
+		-c)
 			shift
 			HMM_CONFIG=$1
 			verbose "Using config: $HMM_CONFIG"
 			shift
 			;;
-		-c)
+		--control)
 			shift
 			HMM_CONTROL=$1
 			verbose "Using control: $HMM_CONTROL"
@@ -209,7 +216,11 @@ export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BA
 # Friendly name:
 # e.g. my-cool-server-3.0
 #
-export CONTAINER_NAME="$BASE-$TAG"
+CONTAINER_NAME="$BASE"
+if [[ ! $TAG = "" ]]; then
+    CONTAINER_NAME="$CONTAINER_NAME-$TAG"
+fi
+export CONTAINER_NAME
 
 #
 # Compiled launch parameters:
@@ -234,6 +245,7 @@ while test $# -gt 0; do
 			signature
 			echo "HMM_DIR:        $HMM_DIR"
 			echo "HMM_CONFIG:     $HMM_CONFIG"
+			echo "PARENT:         $PARENT"
 			echo "REGISTRY:       $REGISTRY"
 			echo "BASE:           $BASE"
 			echo "TAG:            $TAG"

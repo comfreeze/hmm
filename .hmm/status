@@ -1,0 +1,4 @@
+#!/bin/bash
+verbose "Checking status of $CONTAINER_NAME"
+
+$DOCKER_CMD ps | grep $CONTAINER_NAME
