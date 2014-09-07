@@ -1,0 +1,6 @@
+#!/bin/bash
+
+container_image
+IMAGE=$RETURN_HOLDER
+
+$DOCKER_CMD run -v /var/run/docker.sock:/var/run/docker.sock centurylink/dockerfile-from-image $DOCKER_NAME

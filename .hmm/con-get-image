@@ -1,0 +1,7 @@
+#!/bin/bash
+verbose "Finding current image for $CONTAINER_NAME"
+
+container_image
+IMAGE=$RETURN_HOLDER
+
+echo "$IMAGE"

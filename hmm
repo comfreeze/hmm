@@ -73,6 +73,14 @@ container_port() {
     return
 }
 #
+# Image Lookup
+#
+container_image() {
+    RESULT=$( $DOCKER_CMD inspect -f {{.Image}} $CONTAINER_NAME | cut -d : -f 2 )
+    RETURN_HOLDER=$RESULT
+    return
+}
+#
 # Export functions to children
 #
 export -f signature
@@ -82,6 +90,7 @@ export -f check
 export -f not_empty
 export -f container_pid
 export -f container_port
+export -f container_image
 
 #
 # Command references
