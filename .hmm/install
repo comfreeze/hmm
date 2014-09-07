@@ -28,6 +28,7 @@ install_local() {
     read -n 1 -p "Append updates to $HOME/.bashrc? (y/n) "
     [ $REPLY = "y" ] || real_bashrc_local
     echo " "
+
     read -n 1 -p "Append updates to $HOME/.bash_profile? (y/n) "
     [ $REPLY = "y" ] || real_profile_local
     echo " "
