@@ -9,7 +9,7 @@ echo "TESTING"
 
 $DOCKER_CMD run \
  -a stdin -a stdout -a stderr \
- -i -t --rm=true \
+ -i -t -d --rm=true \
  --name=$CONTAINER_NAME \
  $CONTAINER_ARGS \
  $PARENT $*
