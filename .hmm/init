@@ -2,12 +2,16 @@
 verbose "Initializing local directory for hmm..."
 signature
 
-#
-# Initialize configuration file
-#
-if [ ! -f "$HMM_CONFIG" ]; then
+clean_config() {
+    rm -rf $HMM_CONFIG
+}
+
+real_config() {
     verbose "Generating $HMM_CONFIG"
     cat > $HMM_CONFIG <<EOF
+
+# Parent docker registry name for spawning/reference
+PARENT=""
 
 # Docker registry address (if not port 80, specify port)
 REGISTRY="dockers.comfreeze.net:443"
@@ -26,6 +30,18 @@ VOLUMES=""
 
 # Ports to forward/manage/redirect (prefix each with -p ).  Format is "-p (local:)port" where local is dynamic if not provided.
 PORTS=""
+
+# Default username used in operations requiring one specified.
+CONTAINER_USER=""
+
 EOF
     verbose "Generated $HMM_CONFIG"
-fi
+}
+
+#
+# Initialize configuration file
+#
+verify_install_replace \
+ "$HMM_CONFIG" \
+ clean_config \
+ real_config

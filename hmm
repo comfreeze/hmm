@@ -36,9 +36,9 @@ hmm [feature] [params] action [options]
    -e NAME=value       Define an internal environment variable
    -p (###:)###        Tunnel a port through the container [host:container]
    -v (/path:)/path    Mount a virtual volume into the container [host:container]
-   --control           (nsenter|ssh) Select which access to use in helper calls.
-   --verbose           Enable debug messaging
-   --force             Manually force an operation, if allowed
+   -C (nsenter|ssh)    Select which access to use in helper calls.
+   -V                  Enable debug messaging
+   -F                  Manually force an operation, if allowed
    --path              Display HMM home path
 EOF
 }
@@ -228,11 +228,11 @@ while test $# -gt 0; do
 			ADD_ENV_VARS="$ADD_ENV_VARS -e $DATA"
 			shift
 			;;
-	    --force)
+	    -F|--force)
 	        FORCE=true
 	        shift
 	        ;;
-	    --verbose)
+	    -V|--verbose)
 	        VERBOSE=true
 	        shift
 	        ;;
@@ -246,13 +246,13 @@ while test $# -gt 0; do
 			verbose "Using home: $HMM_DIR"
 			shift
 			;;
-		-c)
+		-c|--config)
 			shift
 			HMM_CONFIG=$1
 			verbose "Using config: $HMM_CONFIG"
 			shift
 			;;
-		--control)
+		-C|--control)
 			shift
 			HMM_CONTROL=$1
 			verbose "Using control: $HMM_CONTROL"
