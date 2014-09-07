@@ -6,10 +6,11 @@ if [ $HMM_CONTROL = "nsenter" ]; then
     verbose "Entering namespace for $CONTAINER_NAME (PID: $PID)"
     CMD="sudo nsenter --target $PID --mount --uts --ipc --net --pid"
 else
+    not_empty $CONTAINER_USER "CONTAINER_USER not specified"
     container_port 22
     PORT=$RETURN_HOLDER
     verbose "Remoting into $CONTAINER_NAME - $PORT"
-    CMD="ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT comfreeze@localhost"
+    CMD="ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT $CONTAINER_USER@localhost"
 fi
 
 $CMD $*
