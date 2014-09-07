@@ -32,14 +32,14 @@ hmm [feature] [params] action [options]
    -i, --info          Show defined contants
 
  PARAMS:
-   --control           (nsenter|ssh) Select which access to use in helper calls.
+   -c (filename)       Direct configuration file specification (default: config.hmm)
    -e NAME=value       Define an internal environment variable
    -p (###:)###        Tunnel a port through the container [host:container]
    -v (/path:)/path    Mount a virtual volume into the container [host:container]
+   --control           (nsenter|ssh) Select which access to use in helper calls.
    --verbose           Enable debug messaging
    --force             Manually force an operation, if allowed
    --path              Display HMM home path
-   -c (filename) Direct configuration file specification (default: config.hmm)
 EOF
 }
 #
