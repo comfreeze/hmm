@@ -1,4 +1,8 @@
 #!/bin/bash
 verbose "Checking status of $CONTAINER_NAME"
 
-$DOCKER_CMD ps | grep $CONTAINER_NAME
+if [[ ! $CONTAINER_NAME = "" ]]; then
+    $DOCKER_CMD ps | grep $CONTAINER_NAME
+else
+    $DOCKER_CMD ps
+fi
