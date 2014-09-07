@@ -15,6 +15,7 @@ real_profile_local()        { echo "export PATH=$HMM_INSTALL_PATH/hmm:$PATH" >> 
 
 install_local() {
     read -e -p "Where would you like HMM installed? " -i "$HOME/bin" HMM_INSTALL_PATH
+    echo " "
     echo "Installing from $HMM_DIR to $HMM_INSTALL_PATH"
     if [[ "$HMM_DIR" = "$HMM_INSTALL_PATH/hmm" ]]; then
         echo "ERROR: Same directory!"
@@ -26,16 +27,16 @@ install_local() {
      real_install_local
 
     read -n 1 -p "Append updates to $HOME/.bashrc? (y/n) "
-    [ $REPLY = "y" ] || real_bashrc_local
     echo " "
+    [ $REPLY = "n" ] || real_bashrc_local;
 
     read -n 1 -p "Append updates to $HOME/.bash_profile? (y/n) "
-    [ $REPLY = "y" ] || real_profile_local
     echo " "
+    [ $REPLY = "n" ] || real_profile_local;
 
     read -n 1 -p "Run bash completion setup now? (y/n) "
-    [ $REPLY = "y" ] || /bin/bash "$HMM_INSTALL_PATH/hmm.bash"
     echo " "
+    [ $REPLY = "n" ] || /bin/bash "$HMM_INSTALL_PATH/hmm.bash";
 }
 
 clean_install_global()      { sudo rm -rf "$HMM_INSTALL_PATH/hmm"; }
@@ -69,11 +70,7 @@ install_global() {
      real_path_global
 }
 
-echo "What type of installation?"
-select lg in "Local" "Global"; do
-    case $lg in
-        Local) install_local; break;;
-        Global) install_global; break;;
-        *) exit;;
-    esac
-done
+read -n 1 -p "What type of installation? (l)ocal, (g)lobal "
+echo " "
+[ $REPLY = "l" ] && install_local;
+[ $REPLY = "g" ] && install_global;

@@ -118,14 +118,13 @@ verify_install_replace() {
             $INSTALL
         else
             read -n 1 -p "$TARGET exists, clean it first (y/n)? "
+            echo " "
             if [[ "$REPLY" == "y" ]]; then
                 $CLEAN
                 $INSTALL
             else
-                echo " "
                 echo "Skipping $TARGET"
             fi
-            echo " "
         fi
     else
         $INSTALL
