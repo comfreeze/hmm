@@ -81,6 +81,21 @@ container_image() {
     return
 }
 #
+# Actions List
+#
+get_actions() {
+    RESULT=""
+    cd $SCRIPTS/
+    for ACTION_FILE in *
+    do
+        [[ $RESULT = "" ]] || RESULT+=","
+        RESULT+="${ACTION_FILE/$SCRIPTS\//}"
+    done
+    cd $CURDIR
+    RETURN_HOLDER=$RESULT
+    return
+}
+#
 # Export functions to children
 #
 export -f signature
@@ -91,6 +106,7 @@ export -f not_empty
 export -f container_pid
 export -f container_port
 export -f container_image
+export -f get_actions
 
 #
 # Command references
@@ -117,6 +133,8 @@ export HMM_LOCAL_CONFIG=${CURDIR}local.hmm
 export HMM_CONTROL="nsenter"
 export VERBOSE
 export RETURN_HOLDER
+
+
 
 #
 # Parameters
@@ -231,6 +249,9 @@ CONTAINER_NAME="$BASE"
 if [[ ! $TAG = "" ]]; then
     CONTAINER_NAME="$CONTAINER_NAME-$TAG"
 fi
+if [[ $CONTAINER_USER = "" ]]; then
+    CONTAINER_USER="$USER"
+fi
 export CONTAINER_NAME
 
 #
@@ -238,9 +259,8 @@ export CONTAINER_NAME
 # e.g. -p 80:80 -v /var/www -e APP_ENV=prod
 #
 export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
-
 export CONTAINER_SSH="$SSH_PORT"
-
+export CONTAINER_USER
 
 #
 # CLI User Interface
@@ -261,6 +281,7 @@ while test $# -gt 0; do
 			echo "BASE:           $BASE"
 			echo "TAG:            $TAG"
 			echo "DOCKER_NAME:    $DOCKER_NAME"
+			echo "CONTAINER_USER: $CONTAINER_USER"
 			echo "CONTAINER_NAME: $CONTAINER_NAME"
 			echo "CONTAINER_ARGS: $CONTAINER_ARGS"
 			exit 0
