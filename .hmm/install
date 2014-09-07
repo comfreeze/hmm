@@ -1,0 +1,92 @@
+#!/bin/bash
+signature
+
+TYPE=local
+HMM_INSTALL_PATH=/usr/local/lib
+
+install_local() {
+    read -e -p "Where would you like HMM installed? " -i "$HOME/bin" HMM_INSTALL_PATH
+    echo "Installing from $HMM_DIR to $HMM_INSTALL_PATH"
+    if [[ "$HMM_DIR" = "$HMM_INSTALL_PATH/hmm" ]]; then
+        echo "ERROR: Same directory!"
+        exit 1
+    fi
+    mkdir -p $HMM_INSTALL_PATH
+    cp -R "$HMM_DIR" "$HMM_INSTALL_PATH/hmm"
+    echo "export PATH=$HMM_INSTALL_PATH/hmm:$PATH" >> $HOME/.bashrc
+    echo "export PATH=$HMM_INSTALL_PATH/hmm:$PATH" >> $HOME/.bash_profile
+
+    echo "Installing tab-completion helper."
+    echo ". $HMM_INSTALL_PATH/hmm.bash" >> $HOME/.bashrc
+    echo ". $HMM_INSTALL_PATH/hmm.bash" >> $HOME/.bash_profile
+}
+
+install_global() {
+    echo "Installing from $HMM_DIR to $HMM_INSTALL_PATH"
+    sudo mkdir -p $HMM_INSTALL_PATH
+    if [[ -d "$HMM_INSTALL_PATH/hmm" ]]; then
+        echo  "A previous installation exists, remove it first?"
+        select yn in "Yes" "No"; do
+            case $yn in
+                Yes)
+                    sudo rm -rf "$HMM_INSTALL_PATH/hmm"
+                    sudo cp -R "$HMM_DIR" "$HMM_INSTALL_PATH/."
+                    break
+                    ;;
+                *)
+                    exit
+                    ;;
+            esac
+        done
+    else
+        sudo cp -R "$HMM_DIR" "$HMM_INSTALL_PATH"
+    fi
+
+    echo "Installing tab-completion helper."
+    if [[ -f /etc/bash_completion.d/hmm ]]; then
+        echo  "A previous installation exists, remove it first?"
+        select yn in "Yes" "No"; do
+            case $yn in
+                Yes)
+                    sudo rm -rf /etc/bash_completion.d/hmm
+                    sudo ln -s "$HMM_INSTALL_PATH/hmm/hmm.bash" /etc/bash_completion.d/hmm
+                    break
+                    ;;
+                *)
+                    exit
+                    ;;
+            esac
+        done
+    else
+        sudo ln -s "$HMM_INSTALL_PATH/hmm/hmm.bash" /etc/bash_completion.d/hmm
+    fi
+    /bin/bash /etc/bash_completion.d/hmm
+
+    echo "Installing to global PATH"
+    if [[ -f /usr/local/bin/hmm ]]; then
+        echo  "A previous installation exists, remove it first?"
+        select yn in "Yes" "No"; do
+            case $yn in
+                Yes)
+                    sudo rm -rf /usr/local/bin/hmm
+                    sudo ln -s "$HMM_INSTALL_PATH/hmm/hmm" /usr/local/bin/hmm
+                    break
+                    ;;
+                *)
+                    exit
+                    ;;
+            esac
+        done
+    else
+        sudo ln -s "$HMM_INSTALL_PATH/hmm/hmm" /usr/local/bin/hmm
+    fi
+}
+
+echo "What type of installation?"
+select lg in "Local" "Global"; do
+    case $lg in
+        Local) install_local; break;;
+        Global) install_global; break;;
+        *) exit;;
+    esac
+done

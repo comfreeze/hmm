@@ -2,6 +2,13 @@
 VERSION=0.1.0
 VERBOSE=false
 RETURN_HOLDER=
+SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
+
+while [ -h $SELF_PATH ]; do
+    DIR=$(dirname -- "$SELF_PATH")
+    SYM=$(readlink $SELF_PATH)
+    SELF_PATH=$(cd $DIR && cd $(dirname -- "$SYM") && pwd)/$(basename -- "$SYM")
+done
 
 #
 # Colorful ASCII sig - Just cause bubb
@@ -125,16 +132,15 @@ export DOCKER_CMD
 # Always operates on current directory
 #
 export HMM_TARGET_DIR=$( pwd )
-export HMM_DIR=$( dirname "${BASH_SOURCE[0]}" )
+HMM_DIR=$( dirname -- "$SELF_PATH" )
 export CURDIR=$HMM_TARGET_DIR/
 export SCRIPTS="${HMM_DIR}/.hmm"
 export HMM_CONFIG=${CURDIR}config.hmm
 export HMM_LOCAL_CONFIG=${CURDIR}local.hmm
 export HMM_CONTROL="nsenter"
+export HMM_DIR
 export VERBOSE
 export RETURN_HOLDER
-
-
 
 #
 # Parameters
@@ -196,6 +202,12 @@ while test $# -gt 0; do
 	        VERBOSE=true
 	        shift
 	        ;;
+		-h)
+			shift
+			HMM_DIR=$1
+			verbose "Using home: $HMM_DIR"
+			shift
+			;;
 		-c)
 			shift
 			HMM_CONFIG=$1
@@ -274,6 +286,7 @@ while test $# -gt 0; do
 			;;
 		-i|--info)
 			signature
+			echo "SELF_PATH:      $SELF_PATH"
 			echo "HMM_DIR:        $HMM_DIR"
 			echo "HMM_CONFIG:     $HMM_CONFIG"
 			echo "PARENT:         $PARENT"
