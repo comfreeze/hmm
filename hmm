@@ -243,7 +243,19 @@ while test $# -gt 0; do
 	        echo "$HMM_DIR"
 	        exit
 	        ;;
-		-h)
+		-n|--name)
+			shift
+			CONTAINER_NAME=$1
+			verbose "Using name: $CONTAINER_NAME"
+			shift
+			;;
+		-u|--user)
+			shift
+			CONTAINER_USER=$1
+			verbose "Using name: $CONTAINER_NAME"
+			shift
+			;;
+		-h|--home)
 			shift
 			HMM_DIR=$1
 			verbose "Using home: $HMM_DIR"
@@ -298,9 +310,11 @@ export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BA
 # Friendly name:
 # e.g. my-cool-server-3.0
 #
-CONTAINER_NAME="$BASE"
-if [[ ! $TAG = "" ]]; then
-    CONTAINER_NAME="$CONTAINER_NAME-$TAG"
+if [[ $CONTAINER_NAME = "" ]]; then
+    CONTAINER_NAME="$BASE"
+    if [[ ! $TAG = "" ]]; then
+        CONTAINER_NAME="$CONTAINER_NAME-$TAG"
+    fi
 fi
 if [[ $CONTAINER_USER = "" ]]; then
     CONTAINER_USER="$USER"
