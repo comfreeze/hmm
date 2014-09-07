@@ -274,7 +274,7 @@ while test $# -gt 0; do
 				echo " * ${ACTION_FILE/$SCRIPTS\//}"
 			done
 			cd $CURDIR
-			shift
+			exit 0
 			;;
         *)
 			if [[ -f "$SCRIPTS/$1" ]]; then
