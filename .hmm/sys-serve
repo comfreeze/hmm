@@ -8,7 +8,6 @@ not_empty "$PARENT" "PARENT is not defined!"
 echo "TESTING"
 
 $DOCKER_CMD run \
- -a stdin -a stdout -a stderr \
  -i -t -d --rm=true \
  --name=$CONTAINER_NAME \
  $CONTAINER_ARGS \
