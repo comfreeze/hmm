@@ -13,22 +13,24 @@ signature() {
 # Help and usage (early to show for errors)
 #
 usage() {
-	echo "hmm - helper with docker container tooling"
-	echo " "
-	echo "hmm [feature] [params] action [options]"
-	echo " "
-	echo " FEATURES: "
-	echo "   -a, --actions       Show complete list of available actions"
-	echo "   -h, --help          Show brief help"
-	echo "   -i, --info          Show defined contants"
-	echo " "
-	echo " PARAMS: "
-	echo "   --control           (nsenter|ssh) Select which access to use in helper calls."
-	echo "   -e NAME=value       Define an internal environment variable"
-	echo "   -p (###:)###        Tunnel a port through the container [host:container]"
-	echo "   -v (/path:)/path    Mount a virtual volume into the container [host:container]"
-	echo "   --verbose           Enable debug messaging"
-	echo "   -c (filename) Direct configuration file specification (default: config.hmm)"
+    cat << EOF
+hmm - helper with docker container tooling
+
+hmm [feature] [params] action [options]
+
+ FEATURES:
+   -a, --actions       Show complete list of available actions
+   -h, --help          Show brief help
+   -i, --info          Show defined contants
+
+ PARAMS:
+   --control           (nsenter|ssh) Select which access to use in helper calls.
+   -e NAME=value       Define an internal environment variable
+   -p (###:)###        Tunnel a port through the container [host:container]
+   -v (/path:)/path    Mount a virtual volume into the container [host:container]
+   --verbose           Enable debug messaging
+   -c (filename) Direct configuration file specification (default: config.hmm)
+EOF
 }
 #
 # Verbosity helper
