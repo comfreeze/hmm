@@ -12,9 +12,14 @@
 
 _hmm()
 {
-	local cur
-	local TARDIR
-	TARDIR="$(dirname $(which hmm))/.hmm/*"
+    local cur
+    local WHICH
+    local TARDIR
+    local HMM_PATH
+
+    HMM=$( which hmm )
+    HMM_PATH=$( hmm --path )
+    TARDIR="$HMM_PATH/.hmm/*"
 	COMPREPLY=()
 	cur=${COMP_WORDS[COMP_CWORD]}
 	COMPREPLY=($( compgen -W "$(for x in $TARDIR; do echo $(basename ${x%}); done)" -- $cur))

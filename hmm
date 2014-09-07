@@ -36,6 +36,7 @@ hmm [feature] [params] action [options]
    -p (###:)###        Tunnel a port through the container [host:container]
    -v (/path:)/path    Mount a virtual volume into the container [host:container]
    --verbose           Enable debug messaging
+   --path              Display HMM home path
    -c (filename) Direct configuration file specification (default: config.hmm)
 EOF
 }
@@ -201,6 +202,10 @@ while test $# -gt 0; do
 	    --verbose)
 	        VERBOSE=true
 	        shift
+	        ;;
+	    --path)
+	        echo "$HMM_DIR"
+	        exit
 	        ;;
 		-h)
 			shift
