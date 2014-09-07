@@ -2,6 +2,7 @@
 VERSION=0.1.0
 VERBOSE=false
 RETURN_HOLDER=
+FORCE=false
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
 
 while [ -h $SELF_PATH ]; do
@@ -36,6 +37,7 @@ hmm [feature] [params] action [options]
    -p (###:)###        Tunnel a port through the container [host:container]
    -v (/path:)/path    Mount a virtual volume into the container [host:container]
    --verbose           Enable debug messaging
+   --force             Manually force an operation, if allowed
    --path              Display HMM home path
    -c (filename) Direct configuration file specification (default: config.hmm)
 EOF
@@ -104,6 +106,32 @@ get_actions() {
     return
 }
 #
+# Installation helper - verify replace
+verify_install_replace() {
+    TARGET=$1
+    CLEAN=$2
+    INSTALL=$3
+    CONFIRM=$4
+    if [[ -a "$TARGET" ]]; then
+        if [[ $FORCE = true ]]; then
+            $CLEAN
+            $INSTALL
+        else
+            read -n 1 -p "$TARGET exists, clean it first (y/n)? "
+            if [[ "$REPLY" == "y" ]]; then
+                $CLEAN
+                $INSTALL
+            else
+                echo " "
+                echo "Skipping $TARGET"
+            fi
+            echo " "
+        fi
+    else
+        $INSTALL
+    fi
+}
+#
 # Export functions to children
 #
 export -f signature
@@ -115,6 +143,7 @@ export -f container_pid
 export -f container_port
 export -f container_image
 export -f get_actions
+export -f verify_install_replace
 
 #
 # Command references
@@ -132,16 +161,17 @@ export DOCKER_CMD
 # Directory specifications:
 # Always operates on current directory
 #
-export HMM_TARGET_DIR=$( pwd )
 HMM_DIR=$( dirname -- "$SELF_PATH" )
+export HMM_TARGET_DIR=$( pwd )
 export CURDIR=$HMM_TARGET_DIR/
-export SCRIPTS="${HMM_DIR}/.hmm"
 export HMM_CONFIG=${CURDIR}config.hmm
 export HMM_LOCAL_CONFIG=${CURDIR}local.hmm
 export HMM_CONTROL="nsenter"
+export SCRIPTS="${HMM_DIR}/.hmm"
+export FORCE
 export HMM_DIR
-export VERBOSE
 export RETURN_HOLDER
+export VERBOSE
 
 #
 # Parameters
@@ -199,6 +229,10 @@ while test $# -gt 0; do
 			ADD_ENV_VARS="$ADD_ENV_VARS -e $DATA"
 			shift
 			;;
+	    --force)
+	        FORCE=true
+	        shift
+	        ;;
 	    --verbose)
 	        VERBOSE=true
 	        shift
@@ -278,6 +312,7 @@ export CONTAINER_NAME
 export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
 export CONTAINER_SSH="$SSH_PORT"
 export CONTAINER_USER
+export FORCE
 
 #
 # CLI User Interface
