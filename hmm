@@ -64,7 +64,10 @@ check() {
 # Test empty parameters
 #
 not_empty() {
-    [[ ! $1 = "" ]] || echo $2 && exit 1
+    if [[ $1 = "" ]]; then
+        echo $2
+        exit 1
+    fi
 }
 #
 # PID Lookup
@@ -311,6 +314,7 @@ export CONTAINER_NAME
 export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
 export CONTAINER_SSH="$SSH_PORT"
 export CONTAINER_USER
+export PARENT
 export FORCE
 
 #
