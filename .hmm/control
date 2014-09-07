@@ -1,15 +1,15 @@
 #!/bin/bash
 
-if [[ ZED_CONTROL = "nsenter"]]; then
+if [ $HMM_CONTROL = "nsenter" ]; then
     container_pid
     PID=$RETURN_HOLDER
     verbose "Entering namespace for $CONTAINER_NAME (PID: $PID)"
-    CMD=nsenter --target $PID --mount --uts --ipc --net --pid
+    CMD="sudo nsenter --target $PID --mount --uts --ipc --net --pid"
 else
     container_port 22
     PORT=$RETURN_HOLDER
     verbose "Remoting into $CONTAINER_NAME - $PORT"
-    CMD=ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT comfreeze@localhost
+    CMD="ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT comfreeze@localhost"
 fi
 
 $CMD $*
