@@ -3,6 +3,9 @@ verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+if [[ $CONTAINER_NAME = "" ]]; then
+    PARENT = $DOCKER_NAME
+fi
 not_empty "$PARENT" "PARENT is not defined!"
 
 echo "TESTING"
