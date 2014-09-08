@@ -1,6 +1,8 @@
 #!/bin/bash
-verbose "Checking status of $CONTAINER_NAME"
 
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+verbose "Checking status of $CONTAINER_NAME"
 if [[ ! $CONTAINER_NAME = "" ]]; then
     $DOCKER_CMD ps | grep $CONTAINER_NAME
 else

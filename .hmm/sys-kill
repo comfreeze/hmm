@@ -1,5 +1,8 @@
 #!/bin/bash
 verbose "Killing $CONTAINER_NAME..."
 
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
 $DOCKER_CMD stop $CONTAINER_NAME
 $DOCKER_CMD rm $CONTAINER_NAME

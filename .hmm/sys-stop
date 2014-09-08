@@ -1,4 +1,7 @@
 #!/bin/bash
-verbose "Stopping $CONTAINER_NAME..."
 
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Stopping $CONTAINER_NAME..."
 $DOCKER_CMD stop $CONTAINER_NAME

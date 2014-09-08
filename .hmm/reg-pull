@@ -1,4 +1,7 @@
 #!/bin/bash
-verbose "Pulling $DOCKER_NAME..."
 
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+
+verbose "Pulling $DOCKER_NAME..."
 $DOCKER_CMD pull $DOCKER_NAME

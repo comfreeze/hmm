@@ -1,4 +1,0 @@
-#!/bin/bash
-verbose "Debugging $DOCKER_NAME..."
-
-$DOCKER_CMD run -i -t --rm $CONTAINER_ARGS $* /bin/bash

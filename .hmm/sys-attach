@@ -1,4 +1,7 @@
 #!/bin/bash
-verbose "Attaching to $DOCKER_NAME with args: $CONTAINER_ARGS"
 
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+
+verbose "Attaching to $DOCKER_NAME with args: $CONTAINER_ARGS"
 $DOCKER_CMD attach $* $DOCKER_NAME

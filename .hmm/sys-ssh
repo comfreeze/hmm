@@ -2,6 +2,9 @@
 container_port 22
 PORT=$RETURN_HOLDER
 
-verbose "Remoting into $CONTAINER_NAME - $PORT"
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+not_empty "$CONTAINER_USER" "CONTAINER_USER empty!"
 
-ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT comfreeze@localhost $*
+verbose "Remoting into $CONTAINER_NAME - $PORT"
+ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT $CONTAINER_USER@localhost $*

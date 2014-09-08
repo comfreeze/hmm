@@ -1,5 +1,9 @@
 #!/bin/bash
 
+not_empty "$HMM_CONTROL" "HMM_CONTROL not found!"
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
 if [ $HMM_CONTROL = "nsenter" ]; then
     container_pid
     PID=$RETURN_HOLDER

@@ -1,4 +1,8 @@
 #!/bin/bash
-verbose "Committing $CONTAINER_NAME..."
 
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Committing $CONTAINER_NAME..."
 $DOCKER_CMD commit $CONTAINER_NAME $DOCKER_NAME-snapshot

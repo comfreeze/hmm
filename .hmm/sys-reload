@@ -1,4 +1,9 @@
 #!/bin/bash
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
 verbose "Stopping $DOCKER_NAME..."
 $DOCKER_CMD stop $CONTAINER_NAME
 
