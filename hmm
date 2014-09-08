@@ -30,16 +30,27 @@ hmm [feature] [params] action [options]
    -a, --actions       Show complete list of available actions
    -h, --help          Show brief help
    -i, --info          Show defined contants
+   -F, --force         Manually force an operation, if allowed
+   -V, --verbose       Enable debug messaging
+   --path              Display HMM home path
 
  PARAMS:
    -c (filename)       Direct configuration file specification (default: config.hmm)
    -e NAME=value       Define an internal environment variable
    -p (###:)###        Tunnel a port through the container [host:container]
    -v (/path:)/path    Mount a virtual volume into the container [host:container]
-   -C (nsenter|ssh)    Select which access to use in helper calls.
-   -V                  Enable debug messaging
-   -F                  Manually force an operation, if allowed
-   --path              Display HMM home path
+   -C (nsenter|ssh)    Select which access to use in helper calls
+
+ OVERRIDES:
+   NOTE: These options should come after a configuration specification to ensure
+         that values are not overwritten by config load as params are processed FIFO
+   -n (container_name) The raw container name (common handle)
+   -R (registry)       A registry address to exchange image details, if not port 80
+                       then must include port; e.g. localhost:5000 (no protocols).
+   -B (base)           Base name of the image to the registry, a.k.a. repository.
+   -T (tag_name)       The tag referenced on the image in the registry
+   -P (parent)         The parent reference for spawning and serving
+   -u (user)           The user for remote access features, if needed
 EOF
 }
 #
