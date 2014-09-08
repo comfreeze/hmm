@@ -11,28 +11,28 @@ real_config() {
     cat > $HMM_CONFIG <<EOF
 
 # Parent docker registry name for spawning/reference
-PARENT=""
+PARENT="${PARENT}"
 
 # Docker registry address (if not port 80, specify port)
-REGISTRY="dockers.comfreeze.net:443"
+REGISTRY="$REGISTRY"
 
 # Base repository in the registry
-BASE="ubuntu"
+BASE="$BASE"
 
 # Target on the repository, version in big repos, tags in small
-TAG=""
+TAG="$TAG"
 
 # Environment variable to inject (prefix each with -e ).  Format is "-e name=value".
-ENV_VARS=""
+ENV_VARS="$ENV_VARS"
 
 # Volumes/directories to mount/expose (prefix each with -v ).  Format is "-v (local:)internal" and only exposed if local is not provided.
-VOLUMES=""
+VOLUMES="$VOLUMES"
 
 # Ports to forward/manage/redirect (prefix each with -p ).  Format is "-p (local:)port" where local is dynamic if not provided.
-PORTS=""
+PORTS="$PORTS"
 
 # Default username used in operations requiring one specified.
-CONTAINER_USER=""
+CONTAINER_USER="$CONTAINER_USER"
 
 EOF
     verbose "Generated $HMM_CONFIG"

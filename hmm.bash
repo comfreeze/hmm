@@ -24,18 +24,32 @@ _hmm()
     #
     #  The basic options we'll complete.
     #
-    opts="-c --config -h --help"
+    opts=" \
+    -h --help \
+    -a --actions \
+    -i --info \
+    -f --force \
+    -V --verbose \
+    -c --config \
+    -H --home \
+    -p --port \
+    -v --vol \
+    -e --env \
+    -n --name \
+    -R --registry \
+    -B --base \
+    -T --tag \
+    -P --parent \
+    -u --user \
+    -C --control \
+    --path"
 
     #
     #  Complete the arguments to some of the basic commands.
     #
     if [[ "$prev" == -* ]]; then
         case "$prev" in
-            "-c")
-                _filedir '@(hmm)'
-                return 0
-                ;;
-            "--config")
+            "-c"|"--config")
                 _filedir '@(hmm)'
                 return 0
                 ;;

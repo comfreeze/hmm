@@ -167,70 +167,33 @@ HMM_DIR=$( dirname -- "$SELF_PATH" )
 export HMM_TARGET_DIR=$( pwd )
 export CURDIR=$HMM_TARGET_DIR/
 export HMM_CONFIG=${CURDIR}config.hmm
-export HMM_LOCAL_CONFIG=${CURDIR}local.hmm
+export HMM_LOCAL_CONFIG=${HOME}/.hmm/config
 export HMM_CONTROL="nsenter"
 export SCRIPTS="${HMM_DIR}/.hmm"
-export FORCE
-export HMM_DIR
-export RETURN_HOLDER
-export VERBOSE
+
+verbose "HMM_DIR=$HMM_DIR"
+verbose "SCRIPTS=$SCRIPTS"
+verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
+verbose "Remaining OPTS: $opts"
+
+#
+# Includes
+#
+if [ -f "$HMM_LOCAL_CONFIG" ]; then
+	verbose "Using local config $HMM_LOCAL_CONFIG"
+	source "$HMM_LOCAL_CONFIG"
+else
+	if [ -f "$HMM_CONFIG" ]; then
+		verbose "Using config $HMM_CONFIG..."
+		source "$HMM_CONFIG"
+	fi
+fi
 
 #
 # Parameters
 #
 while test $# -gt 0; do
 	case "$1" in
-		-p)
-			shift
-			if test $# -gt 0; then
-				verbose "Setting $1"
-				ADD_PORTS="${ADD_PORTS} -p $1"
-			else
-				verbose "ERROR No port specified"
-				usage
-				exit 1
-			fi
-			shift
-			;;
-		--port*)
-			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			ADD_PORTS="$ADD_PORTS -p $DATA"
-			shift
-			;;
-		-v)
-			shift
-			if test $# -gt 0; then
-				verbose "Setting $1"
-				ADD_VOLUMES="${ADD_VOLUMES} -v $1"
-			else
-				verbose "ERROR: No port specified"
-				usage
-				exit 1
-			fi
-			shift
-			;;
-		--vol*)
-			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			ADD_VOLUMES="$ADD_VOLUMES -v $DATA"
-			shift
-			;;
-		-e)
-			shift
-			if test $# -gt 0; then
-				verbose "Setting $1"
-				ADD_ENV_VARS="${ADD_ENV_VARS} -e $1"
-			else
-				verbose "ERROR: No var specified"
-				usage
-				exit 1
-			fi
-			shift
-			;;
-		--env*)
-			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			ADD_ENV_VARS="$ADD_ENV_VARS -e $DATA"
-			shift
-			;;
 	    -F|--force)
 	        FORCE=true
 	        shift
@@ -239,23 +202,7 @@ while test $# -gt 0; do
 	        VERBOSE=true
 	        shift
 	        ;;
-	    --path)
-	        echo "$HMM_DIR"
-	        exit
-	        ;;
-		-n|--name)
-			shift
-			CONTAINER_NAME=$1
-			verbose "Using name: $CONTAINER_NAME"
-			shift
-			;;
-		-u|--user)
-			shift
-			CONTAINER_USER=$1
-			verbose "Using name: $CONTAINER_NAME"
-			shift
-			;;
-		-h|--home)
+		-H|--home)
 			shift
 			HMM_DIR=$1
 			verbose "Using home: $HMM_DIR"
@@ -265,6 +212,99 @@ while test $# -gt 0; do
 			shift
 			HMM_CONFIG=$1
 			verbose "Using config: $HMM_CONFIG"
+		    source "$HMM_CONFIG"
+			verbose "Loaded config: $HMM_CONFIG"
+			shift
+			;;
+	    --path)
+	        echo "$HMM_DIR"
+	        exit
+	        ;;
+		-p)
+			shift
+			if test $# -gt 0; then
+				verbose "Setting $opt"
+				PORTS+=" -p $1"
+			else
+				verbose "ERROR No port specified"
+				usage
+				exit 1
+			fi
+			shift
+			;;
+		--port*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			PORTS+=" -p $DATA"
+			shift
+			;;
+		-v)
+			shift
+			if test $# -gt 0; then
+				verbose "Setting $1"
+				VOLUMES+=" -v $1"
+			else
+				verbose "ERROR: No port specified"
+				usage
+				exit 1
+			fi
+			shift
+			;;
+		--vol*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			VOLUMES+=" -v $DATA"
+			shift
+			;;
+		-e)
+			shift
+			if test $# -gt 0; then
+				verbose "Setting $1"
+				ENV_VARS+=" -e $1"
+			else
+				verbose "ERROR: No var specified"
+				usage
+				exit 1
+			fi
+			shift
+			;;
+		--env*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			ENV_VARS=" -e $DATA"
+			shift
+			;;
+		-n|--name)
+			shift
+			CONTAINER_NAME=$1
+			verbose "Using name: $CONTAINER_NAME"
+			shift
+			;;
+		-R|--registry)
+			shift
+			REGISTRY=$1
+			verbose "Using registry: $REGISTRY"
+			shift
+			;;
+		-B|--base)
+			shift
+			BASE=$1
+			verbose "Using base: $BASE"
+			shift
+			;;
+		-T|--tag)
+			shift
+			TAG=$1
+			verbose "Using tag: $TAG"
+			shift
+			;;
+		-P|--parent)
+			shift
+			PARENT=$1
+			verbose "Using parent: $PARENT"
+			shift
+			;;
+		-u|--user)
+			shift
+			CONTAINER_USER=$1
+			verbose "Using name: $CONTAINER_NAME"
 			shift
 			;;
 		-C|--control)
@@ -278,23 +318,6 @@ while test $# -gt 0; do
 			;;
 	esac
 done
-
-verbose "HMM_DIR=$HMM_DIR"
-verbose "SCRIPTS=$SCRIPTS"
-verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
-
-#
-# Includes
-#
-if [ -f "$HMM_LOCAL_CONFIG" ]; then
-	verbose "Using local config $HMM_LOCAL_CONFIG"
-	source "$HMM_LOCAL_CONFIG"
-else 
-	if [ -f "$HMM_CONFIG" ]; then
-		verbose "Using config $HMM_CONFIG..."
-		source "$HMM_CONFIG"
-	fi
-fi
 
 PORTS="$PORTS $ADD_PORTS"
 VOLUMES="$VOLUMES $ADD_VOLUMES"
@@ -330,6 +353,9 @@ export CONTAINER_SSH="$SSH_PORT"
 export CONTAINER_USER
 export PARENT
 export FORCE
+export HMM_DIR
+export RETURN_HOLDER
+export VERBOSE
 
 #
 # CLI User Interface
