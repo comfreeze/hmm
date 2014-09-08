@@ -8,8 +8,6 @@ if [[ $CONTAINER_NAME = "" ]]; then
 fi
 not_empty "$PARENT" "PARENT is not defined!"
 
-echo "TESTING"
-
 $DOCKER_CMD run \
  -a stdin -a stdout -a stderr \
  -i -t --rm=true \
