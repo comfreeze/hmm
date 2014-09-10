@@ -16,17 +16,18 @@ for SCRIPT in $SCRIPTS/*; do
             ;;"
 done
 
+BASH_COMPLETE+=" \\"
+
 # echo -e "$BASH_COMPLETE"
 
 echo "${BASH_COMPLETE}" > .compiled_options
-sed -e '/###MINIFY-ACTIONS###/r .compiled_options' hmm.bash > hmmm.bash
-sed -e 's~hmm~hmmm~g' hmmm.bash > hmmm.bash
+sed -e '/^###MINIFY-ACTIONS###/r .compiled_options' hmm.bash > hmmm.bash
 
 # echo -e "$BASH_COMMANDS"
 
 cp hmm hmmm
 echo "${BASH_COMMANDS}" > .compiled_commands
-sed -e '/###MINIFY-ACTIONS####/r .compiled_commands' hmm > hmmm
+sed -e '/^###MINIFY-ACTIONS###/r .compiled_commands' hmm > hmmm
 chmod a+x hmmm
 
 rm -rf .compiled_commands
