@@ -25,6 +25,7 @@ _hmm()
     #  The basic options we'll complete.
     #
     opts=" \
+    ###MINIFY-ACTIONS### \
     -h --help \
     -a --actions \
     -i --info \

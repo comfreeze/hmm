@@ -1,0 +1,33 @@
+#!/bin/bash
+
+HMM_DIR="$( pwd )"
+SCRIPTS="$HMM_DIR/.hmm"
+
+BASH_COMPLETE=""
+BASH_COMMANDS=""
+FILENAME=""
+
+for SCRIPT in $SCRIPTS/*; do
+    FILENAME="${SCRIPT/$SCRIPTS\//}"
+    BASH_COMPLETE+=" ${FILENAME}"
+    BASH_COMMANDS+="
+        ${FILENAME})
+            $( tail -n +2 $SCRIPT )
+            ;;"
+done
+
+# echo -e "$BASH_COMPLETE"
+
+echo "${BASH_COMPLETE}" > .compiled_options
+sed -e '/###MINIFY-ACTIONS###/r .compiled_options' hmm.bash > hmmm.bash
+sed -e 's~hmm~hmmm~g' hmmm.bash > hmmm.bash
+
+# echo -e "$BASH_COMMANDS"
+
+cp hmm hmmm
+echo "${BASH_COMMANDS}" > .compiled_commands
+sed -e '/###MINIFY-ACTIONS####/r .compiled_commands' hmm > hmmm
+chmod a+x hmmm
+
+rm -rf .compiled_commands
+rm -rf .compiled_options

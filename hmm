@@ -404,6 +404,7 @@ while test $# -gt 0; do
 			cd $CURDIR
 			exit 0
 			;;
+        ###MINIFY-ACTIONS###
         *)
 			if [[ -f "$SCRIPTS/$1" ]]; then
 				ACTION="$SCRIPTS/$1"
