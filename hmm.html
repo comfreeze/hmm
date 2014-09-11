@@ -5,14 +5,26 @@
     <title>HMM</title>
 </head>
 <body>
-    <p>Introduction</p>
+    <h1>[H]eadworks [M]achination [M]anagement</h1>
 
     <h2>Flavors</h2>
-
     <ol>
         <li>Standard</li>
         <li>Minified</li>
     </ol>
+
+    <h3>Standard</h3>
+
+    <p>This is the original format of HMM and uses a primary script, <strong>hmm</strong>
+    which references any scripts found in the <em>.hmm</em> sub-directory.  It alos includes
+    a <em>hmm.bash</em> to provide BASH auto-completion.</p>
+
+    <h3>Minified</h3>
+
+    <p>This is the more recent edition and removes the use of the external script folder
+    with the intention of gaining greater portability.  Using this script, build systems
+    and other automations can maintain a single download with no additional required
+    artifacts to cleanup.</p>
 
     <h2>Latest Build</h2>
     <ul>
@@ -26,6 +38,7 @@
             <li><a href="hmmm.tar.bz2">hmmm.tar.bz2</a></li>
         </ul></li>
     </ul>
+
     <footer>&copy;2014 - COMFREEZE.NET, INC</footer>
 </body>
 </html>
