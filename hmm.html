@@ -3,9 +3,30 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>HMM</title>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"
+            type="application/javascript"></script>
 </head>
 <body>
+<div class="container">
     <h1>[H]eadworks [M]achination [M]anagement</h1>
+
+    <h2>Latest Build: ###BUILD_NUMBER###</h2>
+    <ul>
+        <li>Standard:
+            <ul>
+                <li><a href="hmm.tar.gz">hmm.tar.gz</a></li>
+                <li><a href="hmm.tar.bz2">hmm.tar.bz2</a></li>
+            </ul>
+        </li>
+        <li>Minified:
+            <ul>
+                <li><a href="hmmm">hmmm</a></li>
+                <li><a href="hmmm.tar.gz">hmmm.tar.gz</a></li>
+                <li><a href="hmmm.tar.bz2">hmmm.tar.bz2</a></li>
+            </ul>
+        </li>
+    </ul>
 
     <h2>Flavors</h2>
     <ol>
@@ -16,29 +37,69 @@
     <h3>Standard</h3>
 
     <p>This is the original format of HMM and uses a primary script, <strong>hmm</strong>
-    which references any scripts found in the <em>.hmm</em> sub-directory.  It alos includes
-    a <em>hmm.bash</em> to provide BASH auto-completion.</p>
+        which references any scripts found in the <em>.hmm</em> sub-directory. It also includes
+        a <em>hmm.bash</em> to provide BASH auto-completion.</p>
 
     <h3>Minified</h3>
 
     <p>This is the more recent edition and removes the use of the external script folder
-    with the intention of gaining greater portability.  Using this script, build systems
-    and other automations can maintain a single download with no additional required
-    artifacts to cleanup.</p>
+        with the intention of gaining greater portability. Using this script, build systems
+        and other automation can maintain a single download with no additional artifacts to
+        manage.</p>
 
-    <h2>Latest Build</h2>
-    <ul>
-        <li>Standard:<ul>
-            <li><a href="hmm.tar.gz">hmm.tar.gz</a></li>
-            <li><a href="hmm.tar.bz2">hmm.tar.bz2</a></li>
-        </ul></li>
-        <li>Minified:<ul>
-            <li><a href="hmmm">hmmm</a></li>
-            <li><a href="hmmm.tar.gz">hmmm.tar.gz</a></li>
-            <li><a href="hmmm.tar.bz2">hmmm.tar.bz2</a></li>
-        </ul></li>
-    </ul>
+    <h2>Usage</h2>
 
+    <h3>Getting Started</h3>
+
+    <p>HMM assumes that docker is at least installed correctly before it is used, so
+        please consult your platform or libraries preferences on installing docker. GIT is
+        also used by HMM but is not part of the core so as not considered a requirement for
+        normal operation.</p>
+
+    <h3>Create config</h3>
+
+    <p>To get started, you'll probably want a configuration file. HMM was built to include
+        real-time usage support but this heavily tested. Rather, HMM supports a simplified
+        configuration philosophy. Using a fix set of common definitions and shared amongst a
+        library of short hand tools, HMM provides users a rapid tool without the requirements of
+        other languages outside of a SH/BASH environment.</p>
+
+    <p>If you don't have a configuration file, you can initialize one using <strong>init</strong>
+        option. By default, HMM will load two configuration files, <em>~/.hmm/local.hmm</em> and
+        <em>./config.hmm</em> (where . is the current directory). You may specify a different
+        configuration file using the <strong>--config|-c</strong> arguments.</p>
+
+    <pre><code>$ hmm -c myConfig.hmm init</code></pre>
+
+    <p>As of this writing, that should provide the following configuration template:</p>
+    <pre><code>
+# Parent docker registry name for spawning/reference
+PARENT="${PARENT}"
+
+# Docker registry address (if not port 80, specify port)
+REGISTRY="$REGISTRY"
+
+# Base repository in the registry
+BASE="$BASE"
+
+# Target on the repository, version in big repos, tags in small
+TAG="$TAG"
+
+# Environment variable to inject (prefix each with -e ). Format is "-e name=value".
+ENV_VARS="$ENV_VARS"
+
+# Volumes/directories to mount/expose (prefix each with -v ). Format is "-v (local:)internal" and only
+exposed if local is not provided.
+VOLUMES="$VOLUMES"
+
+# Ports to forward/manage/redirect (prefix each with -p ). Format is "-p (local:)port" where local is
+dynamic if not provided.
+PORTS="$PORTS"
+
+# Default username used in operations requiring one specified.
+CONTAINER_USER="$CONTAINER_USER"
+    </code></pre>
     <footer>&copy;2014 - COMFREEZE.NET, INC</footer>
+</div>
 </body>
 </html>
