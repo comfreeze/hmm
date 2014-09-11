@@ -176,8 +176,8 @@ export DOCKER_CMD
 #
 HMM_DIR=$( dirname -- "$SELF_PATH" )
 export HMM_TARGET_DIR=$( pwd )
-export CURDIR=$HMM_TARGET_DIR/
-export HMM_CONFIG=${CURDIR}config.hmm
+export CURDIR=$HMM_TARGET_DIR
+export HMM_CONFIG=${CURDIR}/config.hmm
 export HMM_LOCAL_CONFIG=${HOME}/.hmm/config
 export HMM_CONTROL="nsenter"
 export SCRIPTS="${HMM_DIR}/.hmm"
@@ -193,11 +193,10 @@ verbose "Remaining OPTS: $opts"
 if [ -f "$HMM_LOCAL_CONFIG" ]; then
 	verbose "Using local config $HMM_LOCAL_CONFIG"
 	source "$HMM_LOCAL_CONFIG"
-else
-	if [ -f "$HMM_CONFIG" ]; then
-		verbose "Using config $HMM_CONFIG..."
-		source "$HMM_CONFIG"
-	fi
+fi
+if [ -f "$HMM_CONFIG" ]; then
+	verbose "Using config $HMM_CONFIG..."
+	source "$HMM_CONFIG"
 fi
 
 #
