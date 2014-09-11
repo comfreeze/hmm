@@ -3,5 +3,9 @@
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
 
+if [ ! $PARENT = "" ]; then
+    $DOCKER_CMD pull $PARENT
+fi
+
 verbose "Building $DOCKER_NAME..."
 $DOCKER_CMD build $* -t $DOCKER_NAME .
