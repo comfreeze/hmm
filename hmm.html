@@ -182,6 +182,23 @@ CONTAINER_USER="$CONTAINER_USER"
     images.  If a container should be started again from a previously stopped point, <strong>restart</strong>
     will take care of that need.</p>
 
+    <h4>Sharing/Moving/Copying</h4>
+
+    <p>If a container needs to be shared, the most obvious method is the registry.  A private
+    registry can be used and was, in fact, part of the inspiration in hmm's original creation.
+    The public registry is default without specification of any registry value, if using a private
+    registry on a custom port provide it in the format as in docker for the config with the port
+    suffixed to the host joined via colon.  For example:</p>
+
+    <pre><code>private_registry:8383/my-custom-container:v1_1</code></pre>
+
+    <p>For a more simplistic approach without network requirements, <strong>export</strong> and
+    <strong>import</strong> will operate using <em>tar</em> archives.  The naming of these methods
+    may present confusion when referenced against their docker equivalents but provided a more
+    concise representation of how they operate in the hmm ecosystem, not docker's.  The export
+    action support and optional second param for the output filename but will append a .tar suffix
+    on anything provided so users are not required to know which extension is necessary if changed.</p>
+
     <h4></h4>
 
     <footer>&copy;2014 - COMFREEZE.NET, INC</footer>
