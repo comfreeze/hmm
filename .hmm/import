@@ -1,0 +1,11 @@
+#!/bin/bash
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+container_image
+IMAGE=$RETURN_HOLDER
+
+verbose "Importing $CONTAINER_NAME..."
+$DOCKER_CMD load -i ${1-$DOCKER_NAME}.tar

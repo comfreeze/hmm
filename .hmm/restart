@@ -4,4 +4,4 @@ not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Starting $CONTAINER_NAME..."
-$DOCKER_CMD start $* $CONTAINER_NAME
+$DOCKER_CMD start $CONTAINER_NAME $*

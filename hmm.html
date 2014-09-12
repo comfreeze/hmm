@@ -51,10 +51,43 @@
 
     <h3>Getting Started</h3>
 
+    <h4>Requirements</h4>
+
     <p>HMM assumes that docker is at least installed correctly before it is used, so
         please consult your platform or libraries preferences on installing docker. GIT is
         also used by HMM but is not part of the core so as not considered a requirement for
         normal operation.</p>
+
+    <h4>Installation</h4>
+
+    <p>HMM provides a utility installer in it's beta phase until distribution channels are
+    better identified for a tool of its nature.  An updating feature may be added but plans
+    included utilizing any typical distribution means to install and update in post 1.0
+    releases.  Post 1.0, the installer and related features may or may not be supported.</p>
+
+    <pre><code>$ hmm install</code></pre>
+
+    <p>The installation performs 3 simple tasks, copying HMM and associated assets to a new
+    home where it can be reached by everyone if using global, or just in your user home if
+    selecting local, then linking the executable script and the bash completion to their
+    appropriate locations.  HMM will prompt to replace at any step if existing assets are
+    found unless the <strong>--force|-F</strong> option is provided.</p>
+
+    <pre><code>
+$ hmm install
+-[CFZ]- Headworks Machination Management - v
+What type of installation? (l)ocal, (g)lobal g
+Installing from /home/comfreeze/bin/hmm to /usr/local/lib
+[sudo] password for (user):
+/usr/local/lib/hmm exists, clean it first (y/n)? y
+/etc/bash_completion.d/hmm exists, clean it first (y/n)? y
+/usr/local/bin/hmm exists, clean it first (y/n)? y
+    </code></pre>
+
+    <h4>Super User Privileges</h4>
+
+    <p>HMM attempts to utilize <em>sudo</em> only when absolutely necessary (nsenter) and will
+    prompt for that password during use if it is required to continue.</p>
 
     <h3>Create config</h3>
 
@@ -99,6 +132,58 @@ PORTS="$PORTS"
 # Default username used in operations requiring one specified.
 CONTAINER_USER="$CONTAINER_USER"
     </code></pre>
+
+    <h3>Ready, set, CONTAIN!</h3>
+
+    <p>After a config is generated, there are no special markings and it can be copied as plain
+    text and edited for additional template files as needed.  These configuration files are a
+    simple collection of shell constant definitions, named to imply relationship and comments
+    provided in the generated files (from <em>init</em>).</p>
+
+    <p>There are a few ways you can start the container from this point, the first and most obvious
+    being <strong>start</strong></p>
+
+    <pre><code>$ hmm start</code></pre>
+
+    <p>Or alternatively with a config named SomethingQUIrky.hmm:</p>
+
+    <pre><code>$ hmm -c SomethingQUIrky.hmm start</code></pre>
+
+    <p>It's important to note that due to the nature of it's design, the configuration parameter
+    (--config|-c) should be passed first if used.  Other commands may not provide appropriate
+    insulation if read first to prevent pre-config actions from taking place.</p>
+
+    <h4>Updating</h4>
+
+    <p>Updating docker containers typically involves replacing them in some way.  Since a docker
+    container is usually designed to encapsulate a given environment snapshot, updates are typically
+    replacing a previous environment snapshot with a more updated version.  In large ecosystems,
+    multiple containers may be active and several rotated out during a rolling update to provide
+    high availability while maintaining continuous delivery principles in a perfect scenario.</p>
+
+    <h4>So... updating?</h4>
+
+    <p>A common practice, and the most common method for utilizing HMM to start a system, is the
+    <strong>reload</strong> action.  Reload will stop any current containers actively running
+    which may present conflict on start fresh copies under named aliases.  Once stopped, if one
+    was indeed running, the previous image will be destroyed.  If both operations are successful,
+    the new image will be started in the former's location under it's shared alias/tag/name.  This
+    is a common scenario while building and testing new docker recipes and configurations.</p>
+
+    <p>Common usage will maintain multiple tags at a given container image history, with at least
+    one indicative of the specific versions contained in the recipe and another conveying a top
+    level classification as "latest".  In many cases, tagging the previous version</p>
+
+    <h4>Stopping</h4>
+
+    <p>If a container needs to be stopped, <strong>stop</strong> will pause the machine in a
+    shutdown state but not lost to local docker histories.  If a machine is lingering and needs
+    cleaning, <strong>kill</strong> will attempt to remove the container and any related, unused
+    images.  If a container should be started again from a previously stopped point, <strong>restart</strong>
+    will take care of that need.</p>
+
+    <h4></h4>
+
     <footer>&copy;2014 - COMFREEZE.NET, INC</footer>
 </div>
 </body>
