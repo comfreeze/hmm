@@ -4,14 +4,70 @@
     <meta charset="UTF-8">
     <title>HMM</title>
     <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"
+            type="application/javascript"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"
             type="application/javascript"></script>
+    <style>
+        body {
+            background: -webkit-linear-gradient(#CCCCCC, #FFFFFF); /* For Safari 5.1 to 6.0 */
+            background: -o-linear-gradient(#CCCCCC, #FFFFFF); /* For Opera 11.1 to 12.0 */
+            background: -moz-linear-gradient(#CCCCCC, #FFFFFF); /* For Firefox 3.6 to 15 */
+            background: linear-gradient(#CCCCCC, #FFFFFF); /* Standard syntax */
+            margin-top: 65px;
+        }
+        #content {
+            background: -webkit-linear-gradient(#FFFFFF, #CCCCCC); /* For Safari 5.1 to 6.0 */
+            background: -o-linear-gradient(#FFFFFF, #CCCCCC); /* For Opera 11.1 to 12.0 */
+            background: -moz-linear-gradient(#FFFFFF, #CCCCCC); /* For Firefox 3.6 to 15 */
+            background: linear-gradient(#FFFFFF, #CCCCCC); /* Standard syntax */
+            margin-bottom: 65px;
+        }
+
+        #fixed-footer-bar nav {
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+        .link_target {
+            padding-top: 65px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>[H]eadworks [M]achination [M]anagement</h1>
 
-    <h2>Latest Build: ###BUILD_NUMBER###</h2>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">[H]eadworks [M]achination [M]anagement</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#latest">Latest</a></li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown">Usage <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#install">Install</a></li>
+                        <li><a href="#config">Configuration</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#start">Start Containers</a></li>
+                        <li><a href="#update">Update Containers</a></li>
+                        <li><a href="#stop">Stop Containers</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#share">Sharing</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+
+<div class="container" id="content">
+    <h2 id="latest" class="link_target">Latest Build: ###BUILD_NUMBER###</h2>
     <ul>
         <li>Standard:
             <ul>
@@ -28,7 +84,7 @@
         </li>
     </ul>
 
-    <h2>Flavors</h2>
+    <h2 id="flavors" class="link_target">Flavors</h2>
     <ol>
         <li>Standard</li>
         <li>Minified</li>
@@ -47,7 +103,7 @@
         and other automation can maintain a single download with no additional artifacts to
         manage.</p>
 
-    <h2>Usage</h2>
+    <h2 id="usage" class="link_target">Usage</h2>
 
     <h3>Getting Started</h3>
 
@@ -58,38 +114,38 @@
         also used by HMM but is not part of the core so as not considered a requirement for
         normal operation.</p>
 
-    <h4>Installation</h4>
+    <h4 id="install" class="link_target">Installation</h4>
 
     <p>HMM provides a utility installer in it's beta phase until distribution channels are
-    better identified for a tool of its nature.  An updating feature may be added but plans
-    included utilizing any typical distribution means to install and update in post 1.0
-    releases.  Post 1.0, the installer and related features may or may not be supported.</p>
+        better identified for a tool of its nature. An updating feature may be added but plans
+        included utilizing any typical distribution means to install and update in post 1.0
+        releases. Post 1.0, the installer and related features may or may not be supported.</p>
 
     <pre><code>$ hmm install</code></pre>
 
     <p>The installation performs 3 simple tasks, copying HMM and associated assets to a new
-    home where it can be reached by everyone if using global, or just in your user home if
-    selecting local, then linking the executable script and the bash completion to their
-    appropriate locations.  HMM will prompt to replace at any step if existing assets are
-    found unless the <strong>--force|-F</strong> option is provided.</p>
+        home where it can be reached by everyone if using global, or just in your user home if
+        selecting local, then linking the executable script and the bash completion to their
+        appropriate locations. HMM will prompt to replace at any step if existing assets are
+        found unless the <strong>--force|-F</strong> option is provided.</p>
 
     <pre><code>
-$ hmm install
--[CFZ]- Headworks Machination Management - v
-What type of installation? (l)ocal, (g)lobal g
-Installing from /home/comfreeze/bin/hmm to /usr/local/lib
-[sudo] password for (user):
-/usr/local/lib/hmm exists, clean it first (y/n)? y
-/etc/bash_completion.d/hmm exists, clean it first (y/n)? y
-/usr/local/bin/hmm exists, clean it first (y/n)? y
+        $ hmm install
+        -[CFZ]- Headworks Machination Management - v
+        What type of installation? (l)ocal, (g)lobal g
+        Installing from /home/comfreeze/bin/hmm to /usr/local/lib
+        [sudo] password for (user):
+        /usr/local/lib/hmm exists, clean it first (y/n)? y
+        /etc/bash_completion.d/hmm exists, clean it first (y/n)? y
+        /usr/local/bin/hmm exists, clean it first (y/n)? y
     </code></pre>
 
     <h4>Super User Privileges</h4>
 
     <p>HMM attempts to utilize <em>sudo</em> only when absolutely necessary (nsenter) and will
-    prompt for that password during use if it is required to continue.</p>
+        prompt for that password during use if it is required to continue.</p>
 
-    <h3>Create config</h3>
+    <h3 id="config" class="link_target">Create config</h3>
 
     <p>To get started, you'll probably want a configuration file. HMM was built to include
         real-time usage support but this heavily tested. Rather, HMM supports a simplified
@@ -106,42 +162,42 @@ Installing from /home/comfreeze/bin/hmm to /usr/local/lib
 
     <p>As of this writing, that should provide the following configuration template:</p>
     <pre><code>
-# Parent docker registry name for spawning/reference
-PARENT="${PARENT}"
+        # Parent docker registry name for spawning/reference
+        PARENT="${PARENT}"
 
-# Docker registry address (if not port 80, specify port)
-REGISTRY="$REGISTRY"
+        # Docker registry address (if not port 80, specify port)
+        REGISTRY="$REGISTRY"
 
-# Base repository in the registry
-BASE="$BASE"
+        # Base repository in the registry
+        BASE="$BASE"
 
-# Target on the repository, version in big repos, tags in small
-TAG="$TAG"
+        # Target on the repository, version in big repos, tags in small
+        TAG="$TAG"
 
-# Environment variable to inject (prefix each with -e ). Format is "-e name=value".
-ENV_VARS="$ENV_VARS"
+        # Environment variable to inject (prefix each with -e ). Format is "-e name=value".
+        ENV_VARS="$ENV_VARS"
 
-# Volumes/directories to mount/expose (prefix each with -v ). Format is "-v (local:)internal" and only
-exposed if local is not provided.
-VOLUMES="$VOLUMES"
+        # Volumes/directories to mount/expose (prefix each with -v ). Format is "-v (local:)internal" and only
+        exposed if local is not provided.
+        VOLUMES="$VOLUMES"
 
-# Ports to forward/manage/redirect (prefix each with -p ). Format is "-p (local:)port" where local is
-dynamic if not provided.
-PORTS="$PORTS"
+        # Ports to forward/manage/redirect (prefix each with -p ). Format is "-p (local:)port" where local is
+        dynamic if not provided.
+        PORTS="$PORTS"
 
-# Default username used in operations requiring one specified.
-CONTAINER_USER="$CONTAINER_USER"
+        # Default username used in operations requiring one specified.
+        CONTAINER_USER="$CONTAINER_USER"
     </code></pre>
 
-    <h3>Ready, set, CONTAIN!</h3>
+    <h3 id="start" class="link_target">Ready, set, CONTAIN!</h3>
 
     <p>After a config is generated, there are no special markings and it can be copied as plain
-    text and edited for additional template files as needed.  These configuration files are a
-    simple collection of shell constant definitions, named to imply relationship and comments
-    provided in the generated files (from <em>init</em>).</p>
+        text and edited for additional template files as needed. These configuration files are a
+        simple collection of shell constant definitions, named to imply relationship and comments
+        provided in the generated files (from <em>init</em>).</p>
 
     <p>There are a few ways you can start the container from this point, the first and most obvious
-    being <strong>start</strong></p>
+        being <strong>start</strong></p>
 
     <pre><code>$ hmm start</code></pre>
 
@@ -150,58 +206,66 @@ CONTAINER_USER="$CONTAINER_USER"
     <pre><code>$ hmm -c SomethingQUIrky.hmm start</code></pre>
 
     <p>It's important to note that due to the nature of it's design, the configuration parameter
-    (--config|-c) should be passed first if used.  Other commands may not provide appropriate
-    insulation if read first to prevent pre-config actions from taking place.</p>
+        (--config|-c) should be passed first if used. Other commands may not provide appropriate
+        insulation if read first to prevent pre-config actions from taking place.</p>
 
-    <h4>Updating</h4>
+    <h4 id="update" class="link_target">Updating</h4>
 
-    <p>Updating docker containers typically involves replacing them in some way.  Since a docker
-    container is usually designed to encapsulate a given environment snapshot, updates are typically
-    replacing a previous environment snapshot with a more updated version.  In large ecosystems,
-    multiple containers may be active and several rotated out during a rolling update to provide
-    high availability while maintaining continuous delivery principles in a perfect scenario.</p>
+    <p>Updating docker containers typically involves replacing them in some way. Since a docker
+        container is usually designed to encapsulate a given environment snapshot, updates are typically
+        replacing a previous environment snapshot with a more updated version. In large ecosystems,
+        multiple containers may be active and several rotated out during a rolling update to provide
+        high availability while maintaining continuous delivery principles in a perfect scenario.</p>
 
     <h4>So... updating?</h4>
 
     <p>A common practice, and the most common method for utilizing HMM to start a system, is the
-    <strong>reload</strong> action.  Reload will stop any current containers actively running
-    which may present conflict on start fresh copies under named aliases.  Once stopped, if one
-    was indeed running, the previous image will be destroyed.  If both operations are successful,
-    the new image will be started in the former's location under it's shared alias/tag/name.  This
-    is a common scenario while building and testing new docker recipes and configurations.</p>
+        <strong>reload</strong> action. Reload will stop any current containers actively running
+        which may present conflict on start fresh copies under named aliases. Once stopped, if one
+        was indeed running, the previous image will be destroyed. If both operations are successful,
+        the new image will be started in the former's location under it's shared alias/tag/name. This
+        is a common scenario while building and testing new docker recipes and configurations.</p>
 
     <p>Common usage will maintain multiple tags at a given container image history, with at least
-    one indicative of the specific versions contained in the recipe and another conveying a top
-    level classification as "latest".  In many cases, tagging the previous version</p>
+        one indicative of the specific versions contained in the recipe and another conveying a top
+        level classification as "latest". Typically, docker works on images, so tagging an image after
+        startup may not present the expected machine, especially when volumes have been referenced.
+        HMM helps to make the process simpler by offering <strong>tag</strong> and <strong>snapshot</strong>
+        helper actions.</p>
 
-    <h4>Stopping</h4>
+    <h4 id="stop" class="link_target">Stopping</h4>
 
     <p>If a container needs to be stopped, <strong>stop</strong> will pause the machine in a
-    shutdown state but not lost to local docker histories.  If a machine is lingering and needs
-    cleaning, <strong>kill</strong> will attempt to remove the container and any related, unused
-    images.  If a container should be started again from a previously stopped point, <strong>restart</strong>
-    will take care of that need.</p>
+        shutdown state but not lost to local docker histories. If a machine is lingering and needs
+        cleaning, <strong>kill</strong> will attempt to remove the container and any related, unused
+        images. If a container should be started again from a previously stopped point, <strong>restart</strong>
+        will take care of that need.</p>
 
-    <h4>Sharing/Moving/Copying</h4>
+    <h4 id="share" class="link_target">Sharing/Moving/Copying</h4>
 
-    <p>If a container needs to be shared, the most obvious method is the registry.  A private
-    registry can be used and was, in fact, part of the inspiration in hmm's original creation.
-    The public registry is default without specification of any registry value, if using a private
-    registry on a custom port provide it in the format as in docker for the config with the port
-    suffixed to the host joined via colon.  For example:</p>
+    <p>If a container needs to be shared, the most obvious method is the registry. A private
+        registry can be used and was, in fact, part of the inspiration in hmm's original creation.
+        The public registry is default without specification of any registry value, if using a private
+        registry on a custom port provide it in the format as in docker for the config with the port
+        suffixed to the host joined via colon. For example:</p>
 
     <pre><code>private_registry:8383/my-custom-container:v1_1</code></pre>
 
     <p>For a more simplistic approach without network requirements, <strong>export</strong> and
-    <strong>import</strong> will operate using <em>tar</em> archives.  The naming of these methods
-    may present confusion when referenced against their docker equivalents but provided a more
-    concise representation of how they operate in the hmm ecosystem, not docker's.  The export
-    action support and optional second param for the output filename but will append a .tar suffix
-    on anything provided so users are not required to know which extension is necessary if changed.</p>
+        <strong>import</strong> will operate using <em>tar</em> archives. The naming of these methods
+        may present confusion when referenced against their docker equivalents but provided a more
+        concise representation of how they operate in the hmm ecosystem, not docker's. The export
+        action support and optional second param for the output filename but will append a .tar suffix
+        on anything provided so users are not required to know which extension is necessary if changed.</p>
 
-    <h4></h4>
+</div>
 
-    <footer>&copy;2014 - COMFREEZE.NET, INC</footer>
+<div class="container-fluid text-center" id="fixed-footer-bar">
+    <nav class="navbar navbar-fixed-bottom ">
+        <footer>
+            <span>&copy;2014 - <a href="http://www.comfreeze.net">COMFREEZE.NET, INC</a></span>
+        </footer>
+    </nav>
 </div>
 </body>
 </html>
