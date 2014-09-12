@@ -40,7 +40,7 @@ install_local() {
 }
 
 clean_install_global()      { sudo rm -rf "$HMM_INSTALL_PATH/hmm"; }
-real_install_global()       { sudo cp -R "$HMM_DIR" "$HMM_INSTALL_PATH/."; }
+real_install_global()       { sudo cp -R "$HMM_DIR" "$HMM_INSTALL_PATH/hmm"; }
 
 clean_completion_global()   { sudo rm -rf /etc/bash_completion.d/hmm; }
 real_completion_global()    { sudo ln -s "$HMM_INSTALL_PATH/hmm/hmm.bash" /etc/bash_completion.d/hmm; }
