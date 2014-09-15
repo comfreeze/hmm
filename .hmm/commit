@@ -5,4 +5,4 @@ not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Committing $CONTAINER_NAME..."
-$DOCKER_CMD commit --pause=true --message="${2-hmm_commit}" $CONTAINER_NAME ${1-DOCKER_NAME}
+$DOCKER_CMD commit --pause=true --message=${2-"hmm commit"} $CONTAINER_NAME ${1-$DOCKER_NAME}
