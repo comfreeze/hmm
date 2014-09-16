@@ -121,6 +121,7 @@ get_actions() {
 }
 #
 # Installation helper - verify replace
+#
 verify_install_replace() {
     TARGET=$1
     CLEAN=$2
@@ -142,6 +143,21 @@ verify_install_replace() {
         fi
     else
         $INSTALL
+    fi
+}
+#
+# Download app locator
+#
+downloader() {
+    CMD=`which curl`
+    if [[ ! $CMD = "" ]]; then
+        RETURN_HOLDER="curl -L -o "
+        return
+    fi
+    CMD=`which wget`
+    if [[ ! $CMD = "" ]]; then
+        RETURN_HOLDER="wget -O "
+        return
     fi
 }
 #
@@ -323,6 +339,20 @@ while test $# -gt 0; do
 			verbose "Using control: $HMM_CONTROL"
 			shift
 			;;
+	    --upgrade)
+            downloader
+            DOWNLOADER=$RETURN_HOLDER
+            mkdir /tmp/hmm
+            echo $DOWNLOADER /tmp/hmm/hmm.tar.gz http://hmm.comfreeze.net/hmm.tar.gz
+            $DOWNLOADER /tmp/hmm/hmm.tar.gz http://hmm.comfreeze.net/hmm.tar.gz
+            cd /tmp/hmm
+            tar zxvf hmm.tar.gz
+            ./hmm install
+            cd /tmp
+            rm -rf /tmp/hmm
+            cd $CUR_DIR
+	        exit 0
+	        ;;
 		*)
 			break
 			;;

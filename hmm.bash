@@ -43,6 +43,7 @@ _hmm()
     -P --parent \
     -u --user \
     -C --control \
+    --upgrade \
     --path"
 
     #
