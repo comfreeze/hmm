@@ -8,4 +8,4 @@ container_image
 IMAGE=$RETURN_HOLDER
 
 verbose "Importing $CONTAINER_NAME..."
-$DOCKER_CMD load -i ${1-$DOCKER_NAME}.tar
+$DOCKER_CMD load -i ${1-$CONTAINER_NAME}.tar
