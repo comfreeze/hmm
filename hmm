@@ -346,8 +346,10 @@ while test $# -gt 0; do
             echo $DOWNLOADER /tmp/hmm/hmm.tar.gz http://hmm.comfreeze.net/hmm.tar.gz
             $DOWNLOADER /tmp/hmm/hmm.tar.gz http://hmm.comfreeze.net/hmm.tar.gz
             cd /tmp/hmm
-            tar zxvf hmm.tar.gz
-            ./hmm install
+            if [[ -f hmm.tar.gz ]]; then
+                tar zxvf hmm.tar.gz
+                ./hmm install
+            fi
             cd /tmp
             rm -rf /tmp/hmm
             cd $CUR_DIR
