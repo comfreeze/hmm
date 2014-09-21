@@ -11,10 +11,11 @@ for SCRIPT in $SCRIPTS/*; do
     FILENAME="${SCRIPT/$SCRIPTS\//}"
     BASH_COMPLETE+=" ${FILENAME}"
     BASH_COMMANDS+="
+        ${FILENAME})
             shift
 
-        ${FILENAME})
-            $( tail -n +2 $SCRIPT )
+# INCLUDED FILE CONTENT
+$( tail -n +2 $SCRIPT )
 
             exit 0
             ;;"
