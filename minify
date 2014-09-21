@@ -11,8 +11,11 @@ for SCRIPT in $SCRIPTS/*; do
     FILENAME="${SCRIPT/$SCRIPTS\//}"
     BASH_COMPLETE+=" ${FILENAME}"
     BASH_COMMANDS+="
+            shift
+
         ${FILENAME})
             $( tail -n +2 $SCRIPT )
+
             exit 0
             ;;"
 done
