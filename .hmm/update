@@ -1,0 +1,8 @@
+#!/bin/bash
+
+not_empty "$GIT_CMD" "GIT_CMD not found!"
+
+$GIT_CMD fetch
+
+$GIT_CMD submodule init
+$GIT_CMD submodule update --recursive

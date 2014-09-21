@@ -1,0 +1,10 @@
+#!/bin/bash
+
+not_empty "$GIT_CMD" "GIT_CMD not found!"
+not_empty "$1" "fork requires at least a target name"
+
+verbose "Creating new branch for $1"
+$GIT_CMD branch "$1"
+
+verbose "Switching to new branch: $1"
+$GIT_CMD checkout "$1"
