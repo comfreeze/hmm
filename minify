@@ -13,6 +13,7 @@ for SCRIPT in $SCRIPTS/*; do
     BASH_COMMANDS+="
         ${FILENAME})
             $( tail -n +2 $SCRIPT )
+            exit 0
             ;;"
 done
 
