@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=0.3.1
+VERSION=0.4.0
 VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
@@ -347,7 +347,7 @@ while test $# -gt 0; do
 		-u|--user)
 			shift
 			CONTAINER_USER=$1
-			verbose "Using name: $CONTAINER_NAME"
+			verbose "Using username: $CONTAINER_USER"
 			shift
 			;;
 		-C|--control)
