@@ -29,6 +29,7 @@ Variable      | Usage                                        | Example
  BRANCH       | Branch name from base image                  | 14.04
  ENV_VARS     | Environment variables to inject              | -e ENV=dev -e ANOTHER=1500
  VOLUMES      | Volumes to link/mount                        | -v /home/me/stuff:/inside/dir -v /inside/exposed
+ LINKING      | Other docker containers to link              | -l con1:internal1 -l con2:internal2
  PORTS        | Ports to forward/manage                      | -p 8181:80 -p 33066:3306 -p 22
 
 These elements are referenced through the **HMM** script system and will provide universal simplicity throughout.  To verify that your configuration file is being used, you can use the *info* option (see -i)

@@ -263,6 +263,23 @@ while test $# -gt 0; do
 			PORTS+=" -p $DATA"
 			shift
 			;;
+	    -l)
+	        shift
+	        if test $# -gt 0; then
+	            verbose "Linking $opt"
+	            LINKING+=" --link $1"
+            else
+                verbose "ERROR no alias specified"
+                usage
+                exit 1
+            fi
+	        shift
+	        ;;
+		--link*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			LINKING+=" --link $DATA"
+			shift
+			;;
 		-v)
 			shift
 			if test $# -gt 0; then
@@ -362,6 +379,7 @@ while test $# -gt 0; do
 done
 
 PORTS="$PORTS $ADD_PORTS"
+LINKING="$LINKING $ADD_LINKING"
 VOLUMES="$VOLUMES $ADD_VOLUMES"
 ENV_VARS="$ENV_VARS $ADD_ENV_VARS"
 
@@ -390,7 +408,7 @@ export CONTAINER_NAME
 # Compiled launch parameters:
 # e.g. -p 80:80 -v /var/www -e APP_ENV=prod
 #
-export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
+export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES $LINKING"
 export CONTAINER_SSH="$SSH_PORT"
 export CONTAINER_USER
 export PARENT

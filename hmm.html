@@ -138,14 +138,14 @@
         found unless the <strong>--force|-F</strong> option is provided.</p>
 
     <pre><code>
-        $ hmm install
-        -[CFZ]- Headworks Machination Management - v
-        What type of installation? (l)ocal, (g)lobal g
-        Installing from /home/comfreeze/bin/hmm to /usr/local/lib
-        [sudo] password for (user):
-        /usr/local/lib/hmm exists, clean it first (y/n)? y
-        /etc/bash_completion.d/hmm exists, clean it first (y/n)? y
-        /usr/local/bin/hmm exists, clean it first (y/n)? y
+$ hmm install
+-[CFZ]- Headworks Machination Management - v
+What type of installation? (l)ocal, (g)lobal g
+Installing from /home/comfreeze/bin/hmm to /usr/local/lib
+[sudo] password for (user):
+/usr/local/lib/hmm exists, clean it first (y/n)? y
+/etc/bash_completion.d/hmm exists, clean it first (y/n)? y
+/usr/local/bin/hmm exists, clean it first (y/n)? y
     </code></pre>
 
     <h4>Super User Privileges</h4>
@@ -192,6 +192,9 @@ VOLUMES="$VOLUMES"
 # Ports to forward/manage/redirect (prefix each with -p ). Format is "-p (local:)port" where local is
 dynamic if not provided.
 PORTS="$PORTS"
+
+# Links to other containers (prefix each with --link ).  Format is "-p (source:)alias" where source is container name/tag provided.
+LINKING="$LINKING"
 
 # Default username used in operations requiring one specified.
 CONTAINER_USER="$CONTAINER_USER"
