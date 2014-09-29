@@ -1,0 +1,11 @@
+#!/bin/bash
+verbose "Running 'php $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ -a stdin -a stdout -a stderr \
+ -i -t --rm=true \
+ -v $( pwd ):/overlay \
+ $CONTAINER_ARGS \
+ dockers.comfreeze.net:443/ubuntu:php5-cli "php $*"
