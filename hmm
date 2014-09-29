@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=0.4.1
+VERSION=0.4.2
 VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
@@ -202,6 +202,15 @@ verbose "HMM_DIR=$HMM_DIR"
 verbose "SCRIPTS=$SCRIPTS"
 verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
 verbose "Remaining OPTS: $opts"
+
+#
+# Test first argument for config alias
+#
+if [ -f "$1.hmm" ]; then
+    verbose "Config alias matched, using config $1.hmm..."
+    export HMM_CONFIG=${CURDIR}/${1}.hmm
+    shift
+fi
 
 #
 # Includes
