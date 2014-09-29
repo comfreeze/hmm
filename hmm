@@ -201,7 +201,6 @@ export SCRIPTS="${HMM_DIR}/.hmm"
 verbose "HMM_DIR=$HMM_DIR"
 verbose "SCRIPTS=$SCRIPTS"
 verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
-verbose "Remaining OPTS: $opts"
 
 #
 # Test first argument for config alias

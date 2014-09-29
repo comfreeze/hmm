@@ -12,7 +12,7 @@
 
 _hmm()
 {
-    local cur prev opts base opts actions
+    local cur prev opts actions
     cur="${COMP_WORDS[COMP_CWORD]}"
     PREV_CWORD=${COMP_CWORD}-1
     prev="${COMP_WORDS[$PREV_CWORD]}"
