@@ -1,0 +1,10 @@
+#!/bin/bash
+verbose "Starting MySQL server with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v $( pwd ):/overlay \
+ $CONTAINER_ARGS \
+ dockers.comfreeze.net:443/ubuntu:mysql

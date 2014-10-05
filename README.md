@@ -18,7 +18,8 @@ hmm -a
 
 ###Configuration
 
-**HMM** expects it's configuration files to be named similar to *config.hmm* or *mySystemCONF.hmm* (using .hmm extension) but makes no assumptions about the actual name.  The configuration file will be searched for if not explicitly provided in the command line arguments (see --config) and my feature any filename desired (ie. --config my.conf).
+**HMM** expects it's configuration files to be named similar to *config.hmm* or *mySystemCONF.hmm* (using .hmm extension) but makes no assumptions about the actual name.  The configuration file will be searched for if not explicitly provided as the first command line argument (ie. hmm
+"target_config") where the .hmm extension is assumed, or in the command line arguments (see --config) and may feature any filename desired (ie. --config my.conf).
 
 The configuration file found or specified should provide values from the following table to customize as needed:
 
