@@ -8,4 +8,4 @@ $DOCKER_CMD run \
  -i -t --rm=true \
  -v $( pwd ):/overlay \
  $CONTAINER_ARGS \
- dockers.comfreeze.net:443/ubuntu:grunt "bower $*"
+ dockers.comfreeze.net:443/ubuntu:yeoman "bower $*"
