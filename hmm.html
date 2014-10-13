@@ -280,9 +280,17 @@ CONTAINER_USER="$CONTAINER_USER"
 
     <pre><code>$ hmm -c SomethingQUIrky.hmm start</code></pre>
 
+    <p>Or, as of build 46, again with a config named SomethingQUIrky.hmm:</p>
+
+    <pre><code>$ hmm SomethingQUIrky start</code></pre>
+
     <p>It's important to note that due to the nature of it's design, the configuration parameter
         (--config|-c) should be passed first if used. Other commands may not provide appropriate
-        insulation if read first to prevent pre-config actions from taking place.</p>
+        insulation if read first to prevent pre-config actions from taking place.  This is essential
+        to the update in build 46 adding first parameter config file matching, which only works
+        as the first parameter and only if a matching file with a .hmm is found.  This may be
+        referenced from another directory but the extension should not be included when using
+        the first parameter format of config specification.</p>
 
     <h4 id="update" class="link_target">Updating</h4>
 
