@@ -59,6 +59,8 @@
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown">Usage <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
+                        <li><a href="#helpers">Helpers</a></li>
+                        <li class="divider"></li>
                         <li><a href="#install">Install</a></li>
                         <li><a href="#config">Configuration</a></li>
                         <li class="divider"></li>
@@ -121,6 +123,68 @@
         please consult your platform or libraries preferences on installing docker. GIT is
         also used by HMM but is not part of the core so as not considered a requirement for
         normal operation.</p>
+
+    <h4 id="helpers" class="link_target">Helpers</h4>
+
+    <p>HMM provides several pre-rolled helper containers for specific, utility logic style
+        access to a growing number of languages, frameworks and other beneficial elements that
+        can be cumbersome to install on a specific host for short term goals.</p>
+
+    <p>The list below references the available server and cli command that are available
+        as well as any appearing in the auto-complete (if installed/available).  Each of these
+        will mount the current directory (unless overridden) and perform the requested action
+        on the content found there.</p>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#servers" role="tab" data-toggle="tab">Servers</a></li>
+        <li><a href="#php" role="tab" data-toggle="tab">PHP</a></li>
+        <li><a href="#nodejs" role="tab" data-toggle="tab">NodeJS</a></li>
+        <!--<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>-->
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="servers">
+            <ul class="list-group">
+                <li class="list-group-item">NGINX: hmm serve-html</li>
+                <li class="list-group-item">NGINX+PHP5FPM: <em>hmm serve-php</em></li>
+                <li class="list-group-item">Grunt: <em>hmm serve-grunt</em></li>
+                <li class="list-group-item">Meteor: <em>hmm serve-meteor</em></li>
+                <li class="list-group-item">MySQL: <em>hmm serve-mysql</em></li>
+                <li class="list-group-item">Redis: <em>hmm serve-redis</em></li>
+            </ul>
+        </div>
+        <div class="tab-pane" id="php">
+            <ul class="list-group">
+                <li class="list-group-item">php: <em>hmm cli-php</em></li>
+                <li class="list-group-item">composer: <em>hmm cli-composer</em></li>
+                <li class="list-group-item">laravel: <em>hmm cli-laravel</em></li>
+            </ul>
+        </div>
+        <div class="tab-pane" id="nodejs">
+            <ul class="list-group">
+                <li class="list-group-item">Grunt: <em>hmm cli-grunt</em></li>
+                <li class="list-group-item">Gulp: <em>hmm cli-gulp</em></li>
+                <li class="list-group-item">Bower: <em>hmm cli-bower</em></li>
+                <li class="list-group-item">Meteor: <em>hmm cli-meteor</em></li>
+                <li class="list-group-item">NPM: <em>hmm cli-npm</em></li>
+                <li class="list-group-item">Yo: <em>hmm cli-yo</em></li>
+            </ul>
+        </div>
+        <!--<div class="tab-pane" id="settings">...</div>-->
+    </div>
+
+    <p>For example, <em>hmm server-html</em> will assume the current directory is the intended
+        document root and volume-mount <em>.</em> as <em>/webroot</em> which is the default serve
+        document root directory.  If this is not the desired effect, extending the source image
+        is the most appropriate action to use next.</p>
+
+    <p>To kill a helper app, some will support the use of <em>Ctrl+C</em> to terminate active
+        services.  The compatible systems for this style shutdown typically log output to stdin
+        with little else accessible besides service specifics.  With <em>Ctrl+C</em>, or on
+        containers where the application has overtaken this key combination, use <em>docker ps</em>
+        to list active containers and look for the appropriate port.</p>
 
     <h4 id="install" class="link_target">Installation</h4>
 
