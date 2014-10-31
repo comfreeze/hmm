@@ -8,4 +8,4 @@ $DOCKER_CMD run \
  -i -t --rm=true \
  -v $( pwd ):/webroot \
  $CONTAINER_ARGS \
- dockers.comfreeze.net:443/ubuntu:zend-framework-cli "zf $*"
+ dockers.comfreeze.net:443/ubuntu:zend-framework-cli "/usr/bin/zf $*"

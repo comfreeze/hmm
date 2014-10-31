@@ -1,0 +1,10 @@
+#!/bin/bash
+verbose "Running 'node $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v $( pwd ):/overlay \
+ -p 80 \
+ dockers.comfreeze.net:443/ubuntu:socketio "node $*"
