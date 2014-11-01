@@ -1,5 +1,5 @@
 #!/bin/bash
-verbose "Running 'npm $*' with args: $CONTAINER_ARGS"
+verbose "Running 'node $*' with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
@@ -8,4 +8,4 @@ $DOCKER_CMD run \
  -i -t --rm=true \
  -v $( pwd ):/overlay \
  $CONTAINER_ARGS \
- dockers.comfreeze.net:443/ubuntu:nodejs "/usr/local/bin/npm $*"
+ dockers.comfreeze.net:443/ubuntu:nodejs "/usr/bin/node $*"
