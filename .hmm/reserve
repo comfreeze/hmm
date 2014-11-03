@@ -1,0 +1,16 @@
+#!/bin/bash
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+if [[ $CONTAINER_NAME = "" ]]; then
+    PARENT = $DOCKER_NAME
+fi
+not_empty "$PARENT" "PARENT is not defined!"
+
+$DOCKER_CMD stop $CONTAINER_NAME
+$DOCKER_CMD rm $CONTAINER_NAME
+
+$DOCKER_CMD run \
+ -d --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $PARENT $*
