@@ -5,6 +5,6 @@ not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
 $DOCKER_CMD run \
  --rm=true \
- -v $( pwd ):/webroot \
+ -v "$( pwd ):/webroot" \
  -p 80 \
  dockers.comfreeze.net:443/ubuntu:phpmyadmin
