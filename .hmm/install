@@ -37,6 +37,8 @@ install_local() {
     read -n 1 -p "Run bash completion setup now? (y/n) "
     echo " "
     [ $REPLY = "n" ] || /bin/bash "$HMM_INSTALL_PATH/hmm.bash";
+
+    chmod a+rx "HMM_INSTALL_PATH" -R
 }
 
 clean_install_global()      { sudo rm -rf "$HMM_INSTALL_PATH/hmm"; }
@@ -68,6 +70,8 @@ install_global() {
      "/usr/local/bin/hmm" \
      clean_path_global \
      real_path_global
+
+    sudo chmod a+rx "/usr/local/bin/hmm" -R
 }
 
 read -n 1 -p "What type of installation? (l)ocal, (g)lobal "
