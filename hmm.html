@@ -300,6 +300,10 @@ CONTAINER_USER="$CONTAINER_USER"
 
     <h4 id="update" class="link_target">Updating</h4>
 
+    <p>To update the core image powering a command included with HMM itself, use the -U or --update
+        start flags and the latest image powering that command will automatically be synchronized.
+        Since the library includes quite a few images, a full sync of all assets is not available.</p>
+
     <p>Updating docker containers typically involves replacing them in some way. Since a docker
         container is usually designed to encapsulate a given environment snapshot, updates are typically
         replacing a previous environment snapshot with a more updated version. In large ecosystems,

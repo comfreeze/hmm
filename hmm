@@ -1,8 +1,9 @@
 #!/bin/bash
-VERSION=0.5.0
+VERSION=0.5.1
 VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
+UPDATE=false
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
 
 while [ -h "$SELF_PATH" ]; do
@@ -32,6 +33,7 @@ hmm [feature] [params] action [options]
    -i, --info          Show defined contants
    -F, --force         Manually force an operation, if allowed
    -V, --verbose       Enable debug messaging
+   -U, --update        Update the base image powering the command
    --path              Display HMM home path
 
  PARAMS:
@@ -146,6 +148,16 @@ verify_install_replace() {
     fi
 }
 #
+# Update image helper
+#
+update_current_image() {
+	IMAGE_NAME=$1
+	if [[ $UPDATE = true ]]; then
+		echo "Updating image for $IMAGE_NAME"
+		$DOCKER_CMD pull $IMAGE_NAME
+	fi
+}
+#
 # Download app locator
 #
 downloader() {
@@ -173,6 +185,7 @@ export -f container_port
 export -f container_image
 export -f get_actions
 export -f verify_install_replace
+export -f update_current_image
 
 #
 # Command references
@@ -228,6 +241,10 @@ fi
 #
 while test $# -gt 0; do
 	case "$1" in
+		-U|--update)
+			UPDATE=true
+			shift
+			;;
 	    -F|--force)
 	        FORCE=true
 	        shift
@@ -421,6 +438,7 @@ export CONTAINER_SSH="$SSH_PORT"
 export CONTAINER_USER
 export PARENT
 export FORCE
+export UPDATE
 export HMM_DIR
 export RETURN_HOLDER
 export VERBOSE

@@ -1,4 +1,8 @@
 #!/bin/bash
+SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:grunt
+
+update_current_image $SOURCE_IMAGE
+
 verbose "Running 'grunt serve $*' with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
@@ -7,4 +11,4 @@ $DOCKER_CMD run \
  --rm=true \
  -v "$( pwd ):/overlay" \
  -p 9000 \
- dockers.comfreeze.net:443/ubuntu:grunt "grunt serve $*"
+ $SOURCE_IMAGE "grunt serve $*"
