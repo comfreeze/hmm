@@ -1,0 +1,14 @@
+#!/bin/bash
+SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:jsbin
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running NGINX + PHP5 with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/overlay" \
+ -p 20100:20100 \
+ $SOURCE_IMAGE
