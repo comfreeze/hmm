@@ -12,4 +12,4 @@ $DOCKER_CMD run \
  -i -t --rm=true \
  -v "$( pwd ):/overlay" \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE "bower $*"
+ $SOURCE_IMAGE "bower --config.analytics=false $*"
