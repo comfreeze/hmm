@@ -11,4 +11,4 @@ $DOCKER_CMD run \
  $CONTAINER_ARGS \
  $* \
  $DOCKER_NAME \
- $RUN_CMD
+ "$RUN_CMD"

@@ -369,6 +369,11 @@ while test $# -gt 0; do
 			verbose "Using tag: $TAG"
 			shift
 			;;
+		-t|--test)
+			DOCKER_CMD="echo docker"
+			verbose "Testing only"
+			shift
+			;;
 		-P|--parent)
 			shift
 			PARENT=$1
