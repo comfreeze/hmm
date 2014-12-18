@@ -11,4 +11,5 @@ $DOCKER_CMD run \
  --rm=true \
  -v "$( pwd ):/overlay" \
  -p 9000 \
+ $CONTAINER_ARGS \
  $SOURCE_IMAGE "grunt serve $*"

@@ -11,4 +11,5 @@ $DOCKER_CMD run \
  --rm=true \
  -v "$( pwd ):/var/lib/jenkins" \
  -p 8080 \
+ $CONTAINER_ARGS \
  $SOURCE_IMAGE

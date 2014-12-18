@@ -11,4 +11,5 @@ $DOCKER_CMD run \
  --rm=true \
  -v "$( pwd ):/overlay" \
  -p 20100:20100 \
+ $CONTAINER_ARGS \
  $SOURCE_IMAGE

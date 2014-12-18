@@ -11,4 +11,5 @@ not_empty "$PARENT" "PARENT is not defined!"
 $DOCKER_CMD run \
  -d --name=$CONTAINER_NAME \
  $CONTAINER_ARGS \
- $PARENT $*
+ $PARENT \
+ $*

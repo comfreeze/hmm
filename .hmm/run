@@ -5,4 +5,11 @@ not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
-$DOCKER_CMD run -a stdin -a stdout -a stderr -i -t --rm=true --name=$CONTAINER_NAME $CONTAINER_ARGS $DOCKER_NAME -- "$*"
+$DOCKER_CMD run \
+ -a stdin -a stdout -a stderr \
+ -i -t --rm=true \
+ --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $DOCKER_NAME \
+ -- \
+ "$*"

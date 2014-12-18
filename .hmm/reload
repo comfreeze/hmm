@@ -11,4 +11,9 @@ verbose "Destroying $CONTAINER_NAME..."
 $DOCKER_CMD rm $CONTAINER_NAME
 
 verbose "Starting $DOCKER_NAME..."
-$DOCKER_CMD run -i -t -d --name=$CONTAINER_NAME $CONTAINER_ARGS $* $DOCKER_NAME
+$DOCKER_CMD run \
+ -i -t -d \
+ --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $* \
+ $DOCKER_NAME

@@ -11,4 +11,5 @@ $DOCKER_CMD run \
  --rm=true \
  -v "$( pwd ):/workspace" \
  -p 3000 \
+ $CONTAINER_ARGS \
  $SOURCE_IMAGE "node $*"

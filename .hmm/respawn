@@ -14,4 +14,5 @@ $DOCKER_CMD run \
  -a stdin -a stdout -a stderr \
  -i -t --rm=true \
  $CONTAINER_ARGS \
- $PARENT "$*"
+ $PARENT \
+ "$*"

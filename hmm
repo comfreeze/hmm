@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=0.5.2
+VERSION=0.6.0
 VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
@@ -351,6 +351,12 @@ while test $# -gt 0; do
 			verbose "Using registry: $REGISTRY"
 			shift
 			;;
+		-r|--run)
+			shift
+			RUN_CMD=$1
+			verbose "Using command: $RUN_CMD"
+			shift
+			;;
 		-B|--base)
 			shift
 			BASE=$1
@@ -439,6 +445,7 @@ export CONTAINER_USER
 export PARENT
 export FORCE
 export UPDATE
+export RUN_CMD
 export HMM_DIR
 export RETURN_HOLDER
 export VERBOSE
@@ -462,6 +469,7 @@ while test $# -gt 0; do
 			echo "REGISTRY:       $REGISTRY"
 			echo "BASE:           $BASE"
 			echo "TAG:            $TAG"
+			echo "RUN_CMD:        $RUN_CMD"
 			echo "DOCKER_NAME:    $DOCKER_NAME"
 			echo "CONTAINER_USER: $CONTAINER_USER"
 			echo "CONTAINER_NAME: $CONTAINER_NAME"
