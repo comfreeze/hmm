@@ -423,7 +423,9 @@ ENV_VARS="$ENV_VARS $ADD_ENV_VARS"
 # Fully qualified name:
 # e.g. hostname.domain:port/repository:tag
 #
-export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )
+export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )
+export DOCKER_BASE=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}
+export TAG
 
 #
 # Friendly name:
