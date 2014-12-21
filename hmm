@@ -420,12 +420,15 @@ VOLUMES="$VOLUMES $ADD_VOLUMES"
 ENV_VARS="$ENV_VARS $ADD_ENV_VARS"
 
 #
+# Simplified name without tag
+#
+export DOCKER_BASE="$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}"
+
+#
 # Fully qualified name:
 # e.g. hostname.domain:port/repository:tag
 #
-export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )
-export DOCKER_BASE=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}
-export TAG
+export DOCKER_NAME="${DOCKER_BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )"
 
 #
 # Friendly name:
@@ -456,6 +459,7 @@ export RUN_CMD
 export HMM_DIR
 export RETURN_HOLDER
 export VERBOSE
+export TAG
 
 #
 # CLI User Interface
