@@ -1,0 +1,14 @@
+#!/bin/bash
+SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:mongo
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running MongoDB with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -p 27017 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE $*
