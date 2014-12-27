@@ -37,6 +37,9 @@ LINKING="$LINKING"
 # Default username used in operations requiring one specified.
 CONTAINER_USER="$CONTAINER_USER"
 
+# Command to run for compliant systems that will support it
+RUN_CMD="/bin/bash"
+
 EOF
     verbose "Generated $HMM_CONFIG"
 }
