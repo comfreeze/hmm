@@ -1,0 +1,14 @@
+#!/bin/bash
+SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:couchdb
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running CouchDB with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -p 5984 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE $*
