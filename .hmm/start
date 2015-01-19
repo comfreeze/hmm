@@ -6,7 +6,7 @@ not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Launching $DOCKER_NAME with args: $CONTAINER_ARGS"
 $DOCKER_CMD run \
- -i -t -d \
+$INTERACTIVE -t -d \
  --name=$CONTAINER_NAME \
  $CONTAINER_ARGS \
  $* \

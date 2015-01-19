@@ -9,7 +9,7 @@ not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
 $DOCKER_CMD run \
  -a stdin -a stdout -a stderr \
- -i -t --rm=true \
+$INTERACTIVE -t --rm=true \
  -v "$( pwd ):/overlay" \
  $CONTAINER_ARGS \
  $SOURCE_IMAGE "gulp $*"

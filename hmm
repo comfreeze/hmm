@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=0.6.1
+VERSION=0.7.0
 VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
@@ -214,6 +214,19 @@ export SCRIPTS="${HMM_DIR}/.hmm"
 verbose "HMM_DIR=$HMM_DIR"
 verbose "SCRIPTS=$SCRIPTS"
 verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
+
+#
+# Configure interactivity
+#
+if [[ $- =~ i ]]; then
+	verbose "Non-interative"
+	INTERACTIVE=""
+else
+    verbose "Interactive"
+	INTERACTIVE="-i"
+fi
+
+export INTERACTIVE
 
 #
 # Test first argument for config alias
