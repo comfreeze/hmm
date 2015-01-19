@@ -218,12 +218,12 @@ verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
 #
 # Configure interactivity
 #
-if [[ $- =~ i ]]; then
-	verbose "Non-interative"
-	INTERACTIVE=""
-else
+if [ -t "$fd" ]; then
     verbose "Interactive"
 	INTERACTIVE="-i"
+else
+	verbose "Non-interative"
+	INTERACTIVE=""
 fi
 
 export INTERACTIVE
