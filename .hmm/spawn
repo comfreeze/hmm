@@ -6,8 +6,7 @@ not_empty "$PARENT" "PARENT is not defined!"
 
 update_current_image $PARENT
 
-$DOCKER_CMD run \
- -a stdin -a stdout -a stderr \
+$DOCKER_CMD run  \
 $INTERACTIVE -t --rm=true \
  $CONTAINER_ARGS \
  $PARENT \

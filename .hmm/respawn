@@ -10,8 +10,7 @@ not_empty "$PARENT" "PARENT is not defined!"
 
 $DOCKER_CMD stop $CONTAINER_NAME
 $DOCKER_CMD rm $CONTAINER_NAME
-$DOCKER_CMD run \
- -a stdin -a stdout -a stderr \
+$DOCKER_CMD run  \
 $INTERACTIVE -t --rm=true \
  $CONTAINER_ARGS \
  $PARENT \

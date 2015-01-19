@@ -220,7 +220,7 @@ verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
 #
 if [ -t "$fd" ]; then
     verbose "Interactive"
-	INTERACTIVE="-i"
+	INTERACTIVE="-a stdin -a stdout -a stderr -i"
 else
 	verbose "Non-interative"
 	INTERACTIVE=""
