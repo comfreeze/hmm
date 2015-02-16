@@ -10,5 +10,4 @@ $INTERACTIVE -t --rm=true \
  --name=$CONTAINER_NAME \
  $CONTAINER_ARGS \
  $DOCKER_NAME \
- -- \
  "$*"

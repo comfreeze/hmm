@@ -2,17 +2,23 @@
 <html>
 <head lang="en">
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="hmm - headworks machination management - simple docker container utility with git and other helper actions.">
-    <meta name="author" content="James Zimmerman II">
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="hmm - headworks machination management - simple docker container utility with git and other helper actions.">
+    <meta name="author"
+          content="James Zimmerman II">
     <title>HMM</title>
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"
             type="application/javascript"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"
             type="application/javascript"></script>
-    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
+          rel="stylesheet"/>
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"
+          rel="stylesheet"/>
     <style>
         body {
             background: -webkit-linear-gradient(#CCCCCC, #FFFFFF); /* For Safari 5.1 to 6.0 */
@@ -21,6 +27,7 @@
             background: linear-gradient(#CCCCCC, #FFFFFF); /* Standard syntax */
             margin-top: 65px;
         }
+
         #content {
             background: -webkit-linear-gradient(#FFFFFF, #CCCCCC); /* For Safari 5.1 to 6.0 */
             background: -o-linear-gradient(#FFFFFF, #CCCCCC); /* For Opera 11.1 to 12.0 */
@@ -32,9 +39,11 @@
         #fixed-footer-bar nav {
             background-color: rgba(255, 255, 255, 0.85);
         }
+
         .link_target {
             padding-top: 65px;
         }
+
         .logo_letter {
             color: gold;
         }
@@ -42,59 +51,101 @@
 </head>
 <body>
 
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<div class="navbar navbar-inverse navbar-fixed-top"
+     role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <button type="button"
+                    class="navbar-toggle collapsed"
+                    data-toggle="collapse"
+                    data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">[<span class="logo_letter" title="Headworks">H</span>] [<span class="logo_letter" title="Machination">M</span>] [<span class="logo_letter" title="Management">M</span>]</a>
+            <a class="navbar-brand"
+               href="#">[<span class="logo_letter"
+                               title="Headworks">H</span>] [<span class="logo_letter"
+                                                                  title="Machination">M</span>]
+                        [<span class="logo_letter"
+                               title="Management">M</span>]
+            </a>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#latest">Latest</a></li>
+                <li class="active">
+                    <a href="#latest">Latest</a>
+                </li>
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown">Usage <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#helpers">Helpers</a></li>
+                    <a class="dropdown-toggle"
+                       data-toggle="dropdown">Usage <span class="caret"></span></a>
+                    <ul class="dropdown-menu"
+                        role="menu">
+                        <li>
+                            <a href="#helpers">Helpers</a>
+                        </li>
                         <li class="divider"></li>
-                        <li><a href="#install">Install</a></li>
-                        <li><a href="#config">Configuration</a></li>
+                        <li>
+                            <a href="#install">Install</a>
+                        </li>
+                        <li>
+                            <a href="#config">Configuration</a>
+                        </li>
                         <li class="divider"></li>
-                        <li><a href="#start">Start Containers</a></li>
-                        <li><a href="#update">Update Containers</a></li>
-                        <li><a href="#stop">Stop Containers</a></li>
+                        <li>
+                            <a href="#start">Start Containers</a>
+                        </li>
+                        <li>
+                            <a href="#update">Update Containers</a>
+                        </li>
+                        <li>
+                            <a href="#stop">Stop Containers</a>
+                        </li>
                         <li class="divider"></li>
-                        <li><a href="#share">Sharing</a></li>
+                        <li>
+                            <a href="#share">Sharing</a>
+                        </li>
                     </ul>
                 </li>
             </ul>
-        </div><!--/.nav-collapse -->
+        </div>
+        <!--/.nav-collapse -->
     </div>
 </div>
 
-<div class="container" id="content">
-    <h2 id="latest" class="link_target">Latest Build: ###BUILD_NUMBER###</h2>
+<div class="container"
+     id="content">
+    <h2 id="latest"
+        class="link_target">Latest Build: ###BUILD_NUMBER###</h2>
     <ul>
         <li>Standard:
             <ul>
-                <li><a href="hmm.tar.gz">hmm.tar.gz</a></li>
-                <li><a href="hmm.tar.bz2">hmm.tar.bz2</a></li>
+                <li>
+                    <a href="hmm.tar.gz">hmm.tar.gz</a>
+                </li>
+                <li>
+                    <a href="hmm.tar.bz2">hmm.tar.bz2</a>
+                </li>
             </ul>
         </li>
         <li>Minified:
             <ul>
-                <li><a href="hmmm">hmmm</a></li>
-                <li><a href="hmmm.tar.gz">hmmm.tar.gz</a></li>
-                <li><a href="hmmm.tar.bz2">hmmm.tar.bz2</a></li>
+                <li>
+                    <a href="hmmm">hmmm</a>
+                </li>
+                <li>
+                    <a href="hmmm.tar.gz">hmmm.tar.gz</a>
+                </li>
+                <li>
+                    <a href="hmmm.tar.bz2">hmmm.tar.bz2</a>
+                </li>
             </ul>
         </li>
     </ul>
 
-    <h2 id="flavors" class="link_target">Flavors</h2>
+    <h2 id="flavors"
+        class="link_target">Flavors</h2>
     <ol>
         <li>Standard</li>
         <li>Minified</li>
@@ -103,49 +154,68 @@
     <h3>Standard</h3>
 
     <p>This is the original format of HMM and uses a primary script, <strong>hmm</strong>
-        which references any scripts found in the <em>.hmm</em> sub-directory. It also includes
-        a <em>hmm.bash</em> to provide BASH auto-completion.</p>
+       which references any scripts found in the <em>.hmm</em> sub-directory. It also includes
+       a <em>hmm.bash</em> to provide BASH auto-completion.</p>
 
     <h3>Minified</h3>
 
     <p>This is the more recent edition and removes the use of the external script folder
-        with the intention of gaining greater portability. Using this script, build systems
-        and other automation can maintain a single download with no additional artifacts to
-        manage.</p>
+       with the intention of gaining greater portability. Using this script, build systems
+       and other automation can maintain a single download with no additional artifacts to
+       manage.</p>
 
-    <h2 id="usage" class="link_target">Usage</h2>
+    <h2 id="usage"
+        class="link_target">Usage</h2>
 
     <h3>Getting Started</h3>
 
     <h4>Requirements</h4>
 
     <p>HMM assumes that docker is at least installed correctly before it is used, so
-        please consult your platform or libraries preferences on installing docker. GIT is
-        also used by HMM but is not part of the core so as not considered a requirement for
-        normal operation.</p>
+       please consult your platform or libraries preferences on installing docker. GIT is
+       also used by HMM but is not part of the core so as not considered a requirement for
+       normal operation.</p>
 
-    <h4 id="helpers" class="link_target">Helpers</h4>
+    <h4 id="helpers"
+        class="link_target">Helpers</h4>
 
     <p>HMM provides several pre-rolled helper containers for specific, utility logic style
-        access to a growing number of languages, frameworks and other beneficial elements that
-        can be cumbersome to install on a specific host for short term goals.</p>
+       access to a growing number of languages, frameworks and other beneficial elements that
+       can be cumbersome to install on a specific host for short term goals.</p>
 
     <p>The list below references the available server and cli command that are available
-        as well as any appearing in the auto-complete (if installed/available).  Each of these
-        will mount the current directory (unless overridden) and perform the requested action
-        on the content found there.</p>
+       as well as any appearing in the auto-complete (if installed/available). Each of these
+       will mount the current directory (unless overridden) and perform the requested action
+       on the content found there.</p>
 
     <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="active"><a href="#servers" role="tab" data-toggle="tab">Servers</a></li>
-        <li><a href="#php" role="tab" data-toggle="tab">PHP</a></li>
-        <li><a href="#nodejs" role="tab" data-toggle="tab">NodeJS</a></li>
+    <ul class="nav nav-tabs"
+        role="tablist">
+        <li class="active">
+            <a href="#servers"
+               role="tab"
+               data-toggle="tab">Servers
+            </a>
+        </li>
+        <li>
+            <a href="#php"
+               role="tab"
+               data-toggle="tab">PHP
+            </a>
+        </li>
+        <li>
+            <a href="#nodejs"
+               role="tab"
+               data-toggle="tab">NodeJS
+            </a>
+        </li>
         <!--<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>-->
     </ul>
 
     <!-- Tab panes -->
     <div class="tab-content">
-        <div class="tab-pane active" id="servers">
+        <div class="tab-pane active"
+             id="servers">
             <ul class="list-group">
                 <li class="list-group-item">NGINX: hmm serve-html</li>
                 <li class="list-group-item">NGINX+PHP5FPM: <em>hmm serve-php</em></li>
@@ -158,7 +228,8 @@
                 <li class="list-group-item">Jenkins: <em>hmm serve-jenkins</em></li>
             </ul>
         </div>
-        <div class="tab-pane" id="php">
+        <div class="tab-pane"
+             id="php">
             <ul class="list-group">
                 <li class="list-group-item">PHP: <em>hmm cli-php</em></li>
                 <li class="list-group-item">Composer: <em>hmm cli-composer</em></li>
@@ -167,7 +238,8 @@
                 <li class="list-group-item">PHPMyAdmin: <em>hmm serve-pma</em></li>
             </ul>
         </div>
-        <div class="tab-pane" id="nodejs">
+        <div class="tab-pane"
+             id="nodejs">
             <ul class="list-group">
                 <li class="list-group-item">JXCore: <em>hmm cli-jxcore</em></li>
                 <li class="list-group-item">Grunt: <em>hmm cli-grunt</em></li>
@@ -186,103 +258,107 @@
     </div>
 
     <p>For example, <em>hmm server-html</em> will assume the current directory is the intended
-        document root and volume-mount <em>.</em> as <em>/webroot</em> which is the default serve
-        document root directory.  If this is not the desired effect, extending the source image
-        is the most appropriate action to use next.</p>
+       document root and volume-mount <em>.</em> as <em>/webroot</em> which is the default serve
+       document root directory. If this is not the desired effect, extending the source image
+       is the most appropriate action to use next.</p>
 
     <p>To kill a helper app, some will support the use of <em>Ctrl+C</em> to terminate active
-        services.  The compatible systems for this style shutdown typically log output to stdin
-        with little else accessible besides service specifics.  With <em>Ctrl+C</em>, or on
-        containers where the application has overtaken this key combination, use <em>docker ps</em>
-        to list active containers and look for the appropriate port.</p>
+       services. The compatible systems for this style shutdown typically log output to stdin
+       with little else accessible besides service specifics. With <em>Ctrl+C</em>, or on
+       containers where the application has overtaken this key combination, use <em>docker ps</em>
+       to list active containers and look for the appropriate port.</p>
 
-    <h4 id="install" class="link_target">Installation</h4>
+    <h4 id="install"
+        class="link_target">Installation</h4>
 
     <p>HMM provides a utility installer in it's beta phase until distribution channels are
-        better identified for a tool of its nature. An updating feature may be added but plans
-        included utilizing any typical distribution means to install and update in post 1.0
-        releases. Post 1.0, the installer and related features may or may not be supported.</p>
+       better identified for a tool of its nature. An updating feature may be added but plans
+       included utilizing any typical distribution means to install and update in post 1.0
+       releases. Post 1.0, the installer and related features may or may not be supported.</p>
 
     <pre><code>$ hmm install</code></pre>
 
     <p>The installation performs 3 simple tasks, copying HMM and associated assets to a new
-        home where it can be reached by everyone if using global, or just in your user home if
-        selecting local, then linking the executable script and the bash completion to their
-        appropriate locations. HMM will prompt to replace at any step if existing assets are
-        found unless the <strong>--force|-F</strong> option is provided.</p>
+       home where it can be reached by everyone if using global, or just in your user home if
+       selecting local, then linking the executable script and the bash completion to their
+       appropriate locations. HMM will prompt to replace at any step if existing assets are
+       found unless the <strong>--force|-F</strong> option is provided.</p>
 
     <pre><code>
-$ hmm install
--[CFZ]- Headworks Machination Management - v
-What type of installation? (l)ocal, (g)lobal g
-Installing from /home/comfreeze/bin/hmm to /usr/local/lib
-[sudo] password for (user):
-/usr/local/lib/hmm exists, clean it first (y/n)? y
-/etc/bash_completion.d/hmm exists, clean it first (y/n)? y
-/usr/local/bin/hmm exists, clean it first (y/n)? y
+        $ hmm install
+        -[CFZ]- Headworks Machination Management - v
+        What type of installation? (l)ocal, (g)lobal g
+        Installing from /home/comfreeze/bin/hmm to /usr/local/lib
+        [sudo] password for (user):
+        /usr/local/lib/hmm exists, clean it first (y/n)? y
+        /etc/bash_completion.d/hmm exists, clean it first (y/n)? y
+        /usr/local/bin/hmm exists, clean it first (y/n)? y
     </code></pre>
 
     <h4>Super User Privileges</h4>
 
     <p>HMM attempts to utilize <em>sudo</em> only when absolutely necessary (nsenter) and will
-        prompt for that password during use if it is required to continue.</p>
+       prompt for that password during use if it is required to continue.</p>
 
-    <h3 id="config" class="link_target">Create config</h3>
+    <h3 id="config"
+        class="link_target">Create config</h3>
 
     <p>To get started, you'll probably want a configuration file. HMM was built to include
-        real-time usage support but this heavily tested. Rather, HMM supports a simplified
-        configuration philosophy. Using a fix set of common definitions and shared amongst a
-        library of short hand tools, HMM provides users a rapid tool without the requirements of
-        other languages outside of a SH/BASH environment.</p>
+       real-time usage support but this heavily tested. Rather, HMM supports a simplified
+       configuration philosophy. Using a fix set of common definitions and shared amongst a
+       library of short hand tools, HMM provides users a rapid tool without the requirements of
+       other languages outside of a SH/BASH environment.</p>
 
     <p>If you don't have a configuration file, you can initialize one using <strong>init</strong>
-        option. By default, HMM will load two configuration files, <em>~/.hmm/local.hmm</em> and
+       option. By default, HMM will load two configuration files, <em>~/.hmm/local.hmm</em> and
         <em>./config.hmm</em> (where . is the current directory). You may specify a different
-        configuration file using the <strong>--config|-c</strong> arguments.</p>
+       configuration file using the <strong>--config|-c</strong> arguments.</p>
 
     <pre><code>$ hmm -c myConfig.hmm init</code></pre>
 
     <p>As of this writing, that should provide the following configuration template:</p>
     <pre><code>
-# Parent docker registry name for spawning/reference
-PARENT="${PARENT}"
+        # Parent docker registry name for spawning/reference
+        PARENT="${PARENT}"
 
-# Docker registry address (if not port 80, specify port)
-REGISTRY="$REGISTRY"
+        # Docker registry address (if not port 80, specify port)
+        REGISTRY="$REGISTRY"
 
-# Base repository in the registry
-BASE="$BASE"
+        # Base repository in the registry
+        BASE="$BASE"
 
-# Target on the repository, version in big repos, tags in small
-TAG="$TAG"
+        # Target on the repository, version in big repos, tags in small
+        TAG="$TAG"
 
-# Environment variable to inject (prefix each with -e ). Format is "-e name=value".
-ENV_VARS="$ENV_VARS"
+        # Environment variable to inject (prefix each with -e ). Format is "-e name=value".
+        ENV_VARS="$ENV_VARS"
 
-# Volumes/directories to mount/expose (prefix each with -v ). Format is "-v (local:)internal" and only
-exposed if local is not provided.
-VOLUMES="$VOLUMES"
+        # Volumes/directories to mount/expose (prefix each with -v ). Format is "-v (local:)internal" and only
+        exposed if local is not provided.
+        VOLUMES="$VOLUMES"
 
-# Ports to forward/manage/redirect (prefix each with -p ). Format is "-p (local:)port" where local is
-dynamic if not provided.
-PORTS="$PORTS"
+        # Ports to forward/manage/redirect (prefix each with -p ). Format is "-p (local:)port" where local is
+        dynamic if not provided.
+        PORTS="$PORTS"
 
-# Links to other containers (prefix each with --link ).  Format is "-p (source:)alias" where source is container name/tag provided.
-LINKING="$LINKING"
+        # Links to other containers (prefix each with --link ). Format is "-p (source:)alias" where source is container
+        name/tag provided.
+        LINKING="$LINKING"
 
-# Default username used in operations requiring one specified.
-CONTAINER_USER="$CONTAINER_USER"
+        # Default username used in operations requiring one specified.
+        CONTAINER_USER="$CONTAINER_USER"
     </code></pre>
 
-    <h3 id="start" class="link_target">Ready, set, CONTAIN!</h3>
+    <h3 id="start"
+        class="link_target">Ready, set, CONTAIN!</h3>
 
     <p>After a config is generated, there are no special markings and it can be copied as plain
-        text and edited for additional template files as needed. These configuration files are a
-        simple collection of shell constant definitions, named to imply relationship and comments
-        provided in the generated files (from <em>init</em>).</p>
+       text and edited for additional template files as needed. These configuration files are a
+       simple collection of shell constant definitions, named to imply relationship and comments
+       provided in the generated files (from <em>init</em>).</p>
 
     <p>There are a few ways you can start the container from this point, the first and most obvious
-        being <strong>start</strong></p>
+       being <strong>start</strong></p>
 
     <pre><code>$ hmm start</code></pre>
 
@@ -295,69 +371,81 @@ CONTAINER_USER="$CONTAINER_USER"
     <pre><code>$ hmm SomethingQUIrky start</code></pre>
 
     <p>It's important to note that due to the nature of it's design, the configuration parameter
-        (--config|-c) should be passed first if used. Other commands may not provide appropriate
-        insulation if read first to prevent pre-config actions from taking place.  This is essential
-        to the update in build 46 adding first parameter config file matching, which only works
-        as the first parameter and only if a matching file with a .hmm is found.  This may be
-        referenced from another directory but the extension should not be included when using
-        the first parameter format of config specification.</p>
+       (--config|-c) should be passed first if used. Other commands may not provide appropriate
+       insulation if read first to prevent pre-config actions from taking place. This is essential
+       to the update in build 46 adding first parameter config file matching, which only works
+       as the first parameter and only if a matching file with a .hmm is found. This may be
+       referenced from another directory but the extension should not be included when using
+       the first parameter format of config specification.</p>
 
-    <h4 id="update" class="link_target">Updating</h4>
+    <h4 id="update"
+        class="link_target">Updating</h4>
 
     <p>To update the core image powering a command included with HMM itself, use the -U or --update
-        start flags and the latest image powering that command will automatically be synchronized.
-        Since the library includes quite a few images, a full sync of all assets is not available.</p>
+       start flags and the latest image powering that command will automatically be synchronized.
+       Since the library includes quite a few images, a full sync of all assets is not available.</p>
 
     <p>Updating docker containers typically involves replacing them in some way. Since a docker
-        container is usually designed to encapsulate a given environment snapshot, updates are typically
-        replacing a previous environment snapshot with a more updated version. In large ecosystems,
-        multiple containers may be active and several rotated out during a rolling update to provide
-        high availability while maintaining continuous delivery principles in a perfect scenario.</p>
+       container is usually designed to encapsulate a given environment snapshot, updates are typically
+       replacing a previous environment snapshot with a more updated version. In large ecosystems,
+       multiple containers may be active and several rotated out during a rolling update to provide
+       high availability while maintaining continuous delivery principles in a perfect scenario.</p>
 
     <h4>So... updating?</h4>
 
     <p>A common practice, and the most common method for utilizing HMM to start a system, is the
         <strong>reload</strong> action. Reload will stop any current containers actively running
-        which may present conflict on start fresh copies under named aliases. Once stopped, if one
-        was indeed running, the previous image will be destroyed. If both operations are successful,
-        the new image will be started in the former's location under it's shared alias/tag/name. This
-        is a common scenario while building and testing new docker recipes and configurations.</p>
+       which may present conflict on start fresh copies under named aliases. Once stopped, if one
+       was indeed running, the previous image will be destroyed. If both operations are successful,
+       the new image will be started in the former's location under it's shared alias/tag/name. This
+       is a common scenario while building and testing new docker recipes and configurations.</p>
 
     <p>Common usage will maintain multiple tags at a given container image history, with at least
-        one indicative of the specific versions contained in the recipe and another conveying a top
-        level classification as "latest". Typically, docker works on images, so tagging an image after
-        startup may not present the expected machine, especially when volumes have been referenced.
-        HMM helps to make the process simpler by offering <strong>tag</strong> and <strong>snapshot</strong>
-        helper actions.</p>
+       one indicative of the specific versions contained in the recipe and another conveying a top
+       level classification as "latest". Typically, docker works on images, so tagging an image after
+       startup may not present the expected machine, especially when volumes have been referenced.
+       HMM helps to make the process simpler by offering <strong>tag</strong> and <strong>snapshot</strong>
+       helper actions.</p>
 
-    <h4 id="stop" class="link_target">Stopping</h4>
+    <h4 id="stop"
+        class="link_target">Stopping</h4>
 
     <p>If a container needs to be stopped, <strong>stop</strong> will pause the machine in a
-        shutdown state but not lost to local docker histories. If a machine is lingering and needs
-        cleaning, <strong>kill</strong> will attempt to remove the container and any related, unused
-        images. If a container should be started again from a previously stopped point, <strong>restart</strong>
-        will take care of that need.</p>
+       shutdown state but not lost to local docker histories. If a machine is lingering and needs
+       cleaning, <strong>kill</strong> will attempt to remove the container and any related, unused
+       images. If a container should be started again from a previously stopped point, <strong>restart</strong>
+       will take care of that need.</p>
 
-    <h4 id="share" class="link_target">Sharing/Moving/Copying</h4>
+    <h4 id="share"
+        class="link_target">Sharing/Moving/Copying</h4>
 
     <p>If a container needs to be shared, the most obvious method is the registry. A private
-        registry can be used and was, in fact, part of the inspiration in hmm's original creation.
-        The public registry is default without specification of any registry value, if using a private
-        registry on a custom port provide it in the format as in docker for the config with the port
-        suffixed to the host joined via colon. For example:</p>
+       registry can be used and was, in fact, part of the inspiration in hmm's original creation.
+       The public registry is default without specification of any registry value, if using a private
+       registry on a custom port provide it in the format as in docker for the config with the port
+       suffixed to the host joined via colon. For example:</p>
 
     <pre><code>private_registry:8383/my-custom-container:v1_1</code></pre>
 
     <p>For a more simplistic approach without network requirements, <strong>export</strong> and
         <strong>import</strong> will operate using <em>tar</em> archives. The naming of these methods
-        may present confusion when referenced against their docker equivalents but provided a more
-        concise representation of how they operate in the hmm ecosystem, not docker's. The export
-        action supports an optional second param for the output filename but will append a .tar suffix
-        on anything provided so users are not required to know which extension is necessary if changed.</p>
+       may present confusion when referenced against their docker equivalents but provided a more
+       concise representation of how they operate in the hmm ecosystem, not docker's. The export
+       action supports an optional second param for the output filename but will append a .tar suffix
+       on anything provided so users are not required to know which extension is necessary if changed.</p>
+
+    <h4 id="clean"
+        class="link_target">Cleanup</h4>
+
+    <p>HMM does offer some assistance for keeping your docker system clean, though presently the options are limited.
+       Use the <strong>purge</strong> command to remove a huge chunk of layers from the local docker storage. Note: This
+       does not remove all layers, but does try to be aggressive, so be careful on systems storing unique images, they
+       may be deleted with no chance of recovery.</p>
 
 </div>
 
-<div class="container-fluid text-center" id="fixed-footer-bar">
+<div class="container-fluid text-center"
+     id="fixed-footer-bar">
     <nav class="navbar navbar-fixed-bottom ">
         <footer>
             <span>&copy;2014 - <a href="http://www.comfreeze.net">COMFREEZE.NET, INC</a></span>
@@ -365,10 +453,17 @@ CONTAINER_USER="$CONTAINER_USER"
     </nav>
 </div>
 <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
     ga('create', 'UA-49477060-3', 'auto');
     ga('send', 'pageview');
 
