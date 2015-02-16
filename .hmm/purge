@@ -1,7 +1,7 @@
 #!/bin/bash
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
-not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+#not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
 
 verbose "Purging local docker storage..."
 
