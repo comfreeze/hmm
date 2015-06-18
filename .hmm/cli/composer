@@ -1,13 +1,14 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:mongo
+SOURCE_IMAGE=$BASE_OS:php5-cli
 
 update_current_image $SOURCE_IMAGE
 
-verbose "Running 'mongo $*' with args: $CONTAINER_ARGS"
+verbose "Running 'php $*' with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
 $DOCKER_CMD run  \
 $INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE "/usr/bin/mongo $*"
+ $SOURCE_IMAGE "composer $*"

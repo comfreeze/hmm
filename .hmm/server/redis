@@ -1,15 +1,14 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:grunt
+SOURCE_IMAGE=$BASE_OS:redis
 
 update_current_image $SOURCE_IMAGE
 
-verbose "Running 'grunt serve $*' with args: $CONTAINER_ARGS"
+verbose "Starting Redis server with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
 $DOCKER_CMD run \
  --rm=true \
  -v "$( pwd ):/overlay" \
- -p 9000 \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE "grunt serve $*"
+ $SOURCE_IMAGE

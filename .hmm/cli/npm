@@ -1,9 +1,9 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:nodejs
+SOURCE_IMAGE=$BASE_OS:nodejs
 
 update_current_image $SOURCE_IMAGE
 
-verbose "Running 'node $*' with args: $CONTAINER_ARGS"
+verbose "Running 'npm $*' with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
@@ -11,4 +11,4 @@ $DOCKER_CMD run  \
 $INTERACTIVE -t --rm=true \
  -v "$( pwd ):/overlay" \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE "/usr/bin/node $*"
+ $SOURCE_IMAGE "/usr/local/bin/npm $*"

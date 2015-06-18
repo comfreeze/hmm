@@ -1,15 +1,15 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:jsbin
+SOURCE_IMAGE=$BASE_OS:grunt
 
 update_current_image $SOURCE_IMAGE
 
-verbose "Running NGINX + PHP5 with args: $CONTAINER_ARGS"
+verbose "Running 'grunt serve $*' with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
 $DOCKER_CMD run \
  --rm=true \
  -v "$( pwd ):/overlay" \
- -p 20100:20100 \
+ -p 9000 \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE
+ $SOURCE_IMAGE "grunt serve $*"

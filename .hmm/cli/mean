@@ -1,5 +1,5 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:socketio
+SOURCE_IMAGE=$BASE_OS:mean-cli
 
 update_current_image $SOURCE_IMAGE
 
@@ -7,9 +7,8 @@ verbose "Running 'node $*' with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-$DOCKER_CMD run \
- --rm=true \
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
  -v "$( pwd ):/overlay" \
- -p 80 \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE "node $*"
+ $SOURCE_IMAGE "/usr/bin/mean $*"

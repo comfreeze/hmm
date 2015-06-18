@@ -1,5 +1,5 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:nginx-php5fpm
+SOURCE_IMAGE=$BASE_OS:jsbin
 
 update_current_image $SOURCE_IMAGE
 
@@ -9,7 +9,7 @@ not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
 $DOCKER_CMD run \
  --rm=true \
- -v "$( pwd ):/webroot" \
- -p 80 \
+ -v "$( pwd ):/overlay" \
+ -p 20100:20100 \
  $CONTAINER_ARGS \
  $SOURCE_IMAGE

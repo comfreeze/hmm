@@ -1,5 +1,5 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:zend-framework-cli
+SOURCE_IMAGE=$BASE_OS:zend-framework-cli
 
 update_current_image $SOURCE_IMAGE
 

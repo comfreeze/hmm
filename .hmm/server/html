@@ -1,5 +1,5 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:nginx
+SOURCE_IMAGE=$BASE_OS:nginx
 
 update_current_image $SOURCE_IMAGE
 

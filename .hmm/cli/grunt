@@ -1,5 +1,5 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:yeoman
+SOURCE_IMAGE=$BASE_OS:yeoman
 
 update_current_image $SOURCE_IMAGE
 
@@ -11,4 +11,4 @@ $DOCKER_CMD run  \
 $INTERACTIVE -t --rm=true \
  -v "$( pwd ):/overlay" \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE "bower --config.analytics=false $*"
+ $SOURCE_IMAGE "grunt $*"

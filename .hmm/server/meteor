@@ -1,5 +1,5 @@
 #!/bin/bash
-SOURCE_IMAGE=dockers.comfreeze.net:443/ubuntu:nodejs
+SOURCE_IMAGE=$BASE_OS:meteor
 
 update_current_image $SOURCE_IMAGE
 
@@ -10,6 +10,6 @@ not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 $DOCKER_CMD run \
  --rm=true \
  -v "$( pwd ):/overlay" \
- -p 80 \
+ -p 3000 \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE "node $*"
+ $SOURCE_IMAGE "meteor"
