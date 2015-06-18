@@ -4,6 +4,7 @@ VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
 UPDATE=false
+BASE_OS=dockers.comfreeze.net/alpine
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
 
 while [ -h "$SELF_PATH" ]; do
@@ -110,14 +111,28 @@ container_image() {
 # Actions List
 #
 get_actions() {
+    TARGET=$1
     RESULT=""
-    cd $SCRIPTS/
+    cd $TARGET/
     for ACTION_FILE in *
     do
-        [[ $RESULT = "" ]] || RESULT+=","
-        RESULT+="${ACTION_FILE/$SCRIPTS\//}"
+    	if [[ -f $ACTION_FILE ]]; then
+        	[[ $RESULT = "" ]] || RESULT+=","
+        	RESULT+="${ACTION_FILE/$SCRIPTS\//}"
+        fi
+
+        if [[ -d $ACTION_FILE ]]; then
+            echo "Directory $ACTION_FILE"
+            cd $ACTION_FILE
+            for SUB_ACTION_FILE in *
+            do
+                echo "Testing $SUB_ACTION_FILE"
+                [[ $RESULT = "" ]] || RESULT+=","
+                RESULT+="${ACTION_FILE/$SCRIPTS\//}-$SUB_ACTION_FILE"
+			done
+			cd ..
+		fi
     done
-    cd $CURDIR
     RETURN_HOLDER=$RESULT
     return
 }
@@ -198,6 +213,7 @@ else
 fi
 export GIT_CMD="git"
 export DOCKER_CMD
+export BASE_OS
 
 #
 # Directory specifications:
@@ -502,19 +518,20 @@ while test $# -gt 0; do
 			;;
 		-a|--actions)
 			signature
-			cd $SCRIPTS/
+			get_actions "$SCRIPTS/"
 			echo "Available actions:"
-			for ACTION_FILE in *
+			for ACTION_FILE in $RETURN_HOLDER
 			do
 				echo " * ${ACTION_FILE/$SCRIPTS\//}"
 			done
-			cd $CURDIR
 			exit 0
 			;;
 ###MINIFY-ACTIONS###
         *)
-			if [[ -f "$SCRIPTS/$1" ]]; then
-				ACTION="$SCRIPTS/$1"
+            # Allow nested directories
+            TEST="${1/-/\/}"
+			if [[ -f "$SCRIPTS/$TEST" ]]; then
+				ACTION="$SCRIPTS/$TEST"
 				verbose "ACTION: $ACTION"
 				shift
 			fi
