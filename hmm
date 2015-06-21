@@ -8,7 +8,7 @@ VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
 UPDATE=false
-DOCKER_HOST=docker.comfreeze.net
+DOCKER_HOST=dockers.comfreeze.net
 PLATFORM=alpine
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
 
