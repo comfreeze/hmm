@@ -529,7 +529,8 @@ while test $# -gt 0; do
 ###MINIFY-ACTIONS###
         *)
             # Allow nested directories
-            TEST="${1/-/\/}"
+            TEST="${1/(\w)-/$1\/}"
+            echo "Testing for command: ${TEST}"
 			if [[ -f "$SCRIPTS/$TEST" ]]; then
 				ACTION="$SCRIPTS/$TEST"
 				verbose "ACTION: $ACTION"
