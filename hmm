@@ -557,6 +557,8 @@ while test $# -gt 0; do
 				ACTION="$SCRIPTS/$CMD_TARGET"
 				verbose "ACTION: $ACTION"
 				shift
+			else
+				echo "Unrecognized action: $1"
 			fi
             break
             ;;
