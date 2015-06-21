@@ -127,11 +127,9 @@ get_actions() {
         fi
 
         if [[ -d $ACTION_FILE ]]; then
-            echo "Directory $ACTION_FILE"
             cd $ACTION_FILE
             for SUB_ACTION_FILE in *
             do
-                echo "Testing $SUB_ACTION_FILE"
                 [[ $RESULT = "" ]] || RESULT+=","
                 RESULT+="${ACTION_FILE/$SCRIPTS\//}-$SUB_ACTION_FILE"
 			done
@@ -509,6 +507,8 @@ export RETURN_HOLDER
 export VERBOSE
 export TAG
 
+BASE_OS=$DOCKER_HOST/$PLATFORM
+
 #
 # CLI User Interface
 #
@@ -525,8 +525,9 @@ while test $# -gt 0; do
 			echo "HMM_DIR:        $HMM_DIR"
 			echo "HMM_CONFIG:     $HMM_CONFIG"
 			echo "PARENT:         $PARENT"
-			echo "PLATFORM:       $PLATFORM"
 			echo "HOST:           $DOCKER_HOST"
+			echo "PLATFORM:       $PLATFORM"
+			echo "BASE OS:        $BASE_OS"
 			echo "REGISTRY:       $REGISTRY"
 			echo "BASE:           $BASE"
 			echo "TAG:            $TAG"
@@ -543,7 +544,7 @@ while test $# -gt 0; do
 			echo "Available actions:"
 			for ACTION_FILE in $RETURN_HOLDER
 			do
-				echo " * ${ACTION_FILE/$SCRIPTS\//}"
+				echo "${ACTION_FILE}" | tr "," "\n" | column
 			done
 			exit 0
 			;;
@@ -551,7 +552,6 @@ while test $# -gt 0; do
         *)
             # Allow nested directories
             TEST="${1/(\w)-/$1\/}"
-            echo "Testing for command: ${TEST}"
 			if [[ -f "$SCRIPTS/$TEST" ]]; then
 				ACTION="$SCRIPTS/$TEST"
 				verbose "ACTION: $ACTION"
@@ -561,8 +561,6 @@ while test $# -gt 0; do
             ;;
 	esac
 done
-
-BASE_OS=$DOCKER_HOST/$PLATFORM
 
 if [ "$ACTION" != "" ]; then
 	/bin/bash "$ACTION" $*
