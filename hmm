@@ -551,9 +551,10 @@ while test $# -gt 0; do
 ###MINIFY-ACTIONS###
         *)
             # Allow nested directories
-            TEST="${1/(\w)-/$1\/}"
-			if [[ -f "$SCRIPTS/$TEST" ]]; then
-				ACTION="$SCRIPTS/$TEST"
+            CMD_TARGET="${1//-/\/}"
+            verbose "Trying action: ${CMD_TARGET}"
+			if [[ -f "$SCRIPTS/$CMD_TARGET" ]]; then
+				ACTION="$SCRIPTS/$CMD_TARGET"
 				verbose "ACTION: $ACTION"
 				shift
 			fi
