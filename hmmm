@@ -1,0 +1,1049 @@
+#!/bin/bash
+VERSION=0.3.1
+VERBOSE=false
+RETURN_HOLDER=
+FORCE=false
+SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
+
+while [ -h "$SELF_PATH" ]; do
+    DIR=$(dirname -- "$SELF_PATH")
+    SYM=$(readlink "$SELF_PATH")
+    SELF_PATH=$(cd $DIR && cd $(dirname -- "$SYM") && pwd)/$(basename -- "$SYM")
+done
+
+#
+# Colorful ASCII sig - Just cause bubb
+#
+signature() {
+	echo "$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)H$(tput sgr0)eadworks $(tput setaf 1)M$(tput sgr0)achination $(tput setaf 1)M$(tput sgr0)anagement$(tput sgr0) - v$VERSION"
+}
+#
+# Help and usage (early to show for errors)
+#
+usage() {
+    cat << EOF
+hmm - helper with docker container tooling
+
+hmm [feature] [params] action [options]
+
+ FEATURES:
+   -a, --actions       Show complete list of available actions
+   -h, --help          Show brief help
+   -i, --info          Show defined contants
+   -F, --force         Manually force an operation, if allowed
+   -V, --verbose       Enable debug messaging
+   --path              Display HMM home path
+
+ PARAMS:
+   -c (filename)       Direct configuration file specification (default: config.hmm)
+   -e NAME=value       Define an internal environment variable
+   -p (###:)###        Tunnel a port through the container [host:container]
+   -v (/path:)/path    Mount a virtual volume into the container [host:container]
+   -C (nsenter|ssh)    Select which access to use in helper calls
+
+ OVERRIDES:
+   NOTE: These options should come after a configuration specification to ensure
+         that values are not overwritten by config load as params are processed FIFO
+   -n (container_name) The raw container name (common handle)
+   -R (registry)       A registry address to exchange image details, if not port 80
+                       then must include port; e.g. localhost:5000 (no protocols).
+   -B (base)           Base name of the image to the registry, a.k.a. repository.
+   -T (tag_name)       The tag referenced on the image in the registry
+   -P (parent)         The parent reference for spawning and serving
+   -u (user)           The user for remote access features, if needed
+EOF
+}
+#
+# Verbosity helper
+#
+verbose() {
+    if [[ $VERBOSE = true ]]; then
+        echo $1
+    fi
+}
+#
+# Test configuration
+#
+check() {
+    if [[ $CONTAINER_NAME = "-" ]]; then
+        echo "ERROR: Invalid configuration!"
+        usage
+        exit 1
+    fi
+}
+#
+# Test empty parameters
+#
+not_empty() {
+    if [[ $1 = "" ]]; then
+        echo $2
+        exit 1
+    fi
+}
+#
+# PID Lookup
+#
+container_pid() {
+    RESULT=$( $DOCKER_CMD inspect --format {{.State.Pid}} $CONTAINER_NAME )
+    RETURN_HOLDER=$RESULT
+    return
+}
+#
+# PORT Lookup
+#
+container_port() {
+    RESULT=$( $DOCKER_CMD port $CONTAINER_NAME $1 | cut -d : -f 2 )
+    RETURN_HOLDER=$RESULT
+    return
+}
+#
+# Image Lookup
+#
+container_image() {
+    RESULT=$( $DOCKER_CMD inspect -f {{.Image}} $CONTAINER_NAME | cut -d : -f 2 )
+    RETURN_HOLDER=$RESULT
+    return
+}
+#
+# Actions List
+#
+get_actions() {
+    RESULT=""
+    cd $SCRIPTS/
+    for ACTION_FILE in *
+    do
+        [[ $RESULT = "" ]] || RESULT+=","
+        RESULT+="${ACTION_FILE/$SCRIPTS\//}"
+    done
+    cd $CURDIR
+    RETURN_HOLDER=$RESULT
+    return
+}
+#
+# Installation helper - verify replace
+#
+verify_install_replace() {
+    TARGET=$1
+    CLEAN=$2
+    INSTALL=$3
+    CONFIRM=$4
+    if [[ -a "$TARGET" ]]; then
+        if [[ $FORCE = true ]]; then
+            $CLEAN
+            $INSTALL
+        else
+            read -n 1 -p "$TARGET exists, clean it first (y/n)? "
+            echo " "
+            if [[ "$REPLY" == "y" ]]; then
+                $CLEAN
+                $INSTALL
+            else
+                echo "Skipping $TARGET"
+            fi
+        fi
+    else
+        $INSTALL
+    fi
+}
+#
+# Download app locator
+#
+downloader() {
+    CMD=`which curl`
+    if [[ ! $CMD = "" ]]; then
+        RETURN_HOLDER="curl -L -o "
+        return
+    fi
+    CMD=`which wget`
+    if [[ ! $CMD = "" ]]; then
+        RETURN_HOLDER="wget -O "
+        return
+    fi
+}
+#
+# Export functions to children
+#
+export -f signature
+export -f usage
+export -f verbose
+export -f check
+export -f not_empty
+export -f container_pid
+export -f container_port
+export -f container_image
+export -f get_actions
+export -f verify_install_replace
+
+#
+# Command references
+# Alias new versions hack
+#
+if [ -f "/usr/bin/docker.io" ]; then
+ DOCKER_CMD="docker.io"
+else
+ DOCKER_CMD="docker"
+fi
+export GIT_CMD="git"
+export DOCKER_CMD
+
+#
+# Directory specifications:
+# Always operates on current directory
+#
+HMM_DIR=$( dirname -- "$SELF_PATH" )
+export HMM_TARGET_DIR=$( pwd )
+export CURDIR=$HMM_TARGET_DIR
+export HMM_CONFIG=${CURDIR}/config.hmm
+export HMM_LOCAL_CONFIG=${HOME}/.hmm/config
+export HMM_CONTROL="nsenter"
+export SCRIPTS="${HMM_DIR}/.hmm"
+
+verbose "HMM_DIR=$HMM_DIR"
+verbose "SCRIPTS=$SCRIPTS"
+verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
+verbose "Remaining OPTS: $opts"
+
+#
+# Includes
+#
+if [ -f "$HMM_LOCAL_CONFIG" ]; then
+	verbose "Using local config $HMM_LOCAL_CONFIG"
+	source "$HMM_LOCAL_CONFIG"
+fi
+if [ -f "$HMM_CONFIG" ]; then
+	verbose "Using config $HMM_CONFIG..."
+	source "$HMM_CONFIG"
+fi
+
+#
+# Parameters
+#
+while test $# -gt 0; do
+	case "$1" in
+	    -F|--force)
+	        FORCE=true
+	        shift
+	        ;;
+	    -V|--verbose)
+	        VERBOSE=true
+	        shift
+	        ;;
+		-H|--home)
+			shift
+			HMM_DIR=$1
+			verbose "Using home: $HMM_DIR"
+			shift
+			;;
+		-c|--config)
+			shift
+			HMM_CONFIG=$1
+			verbose "Using config: $HMM_CONFIG"
+		    source "$HMM_CONFIG"
+			verbose "Loaded config: $HMM_CONFIG"
+			shift
+			;;
+	    --path)
+	        echo "$HMM_DIR"
+	        exit
+	        ;;
+		-p)
+			shift
+			if test $# -gt 0; then
+				verbose "Setting $opt"
+				PORTS+=" -p $1"
+			else
+				verbose "ERROR No port specified"
+				usage
+				exit 1
+			fi
+			shift
+			;;
+		--port*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			PORTS+=" -p $DATA"
+			shift
+			;;
+		-v)
+			shift
+			if test $# -gt 0; then
+				verbose "Setting $1"
+				VOLUMES+=" -v $1"
+			else
+				verbose "ERROR: No port specified"
+				usage
+				exit 1
+			fi
+			shift
+			;;
+		--vol*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			VOLUMES+=" -v $DATA"
+			shift
+			;;
+		-e)
+			shift
+			if test $# -gt 0; then
+				verbose "Setting $1"
+				ENV_VARS+=" -e $1"
+			else
+				verbose "ERROR: No var specified"
+				usage
+				exit 1
+			fi
+			shift
+			;;
+		--env*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			ENV_VARS=" -e $DATA"
+			shift
+			;;
+		-n|--name)
+			shift
+			CONTAINER_NAME=$1
+			verbose "Using name: $CONTAINER_NAME"
+			shift
+			;;
+		-R|--registry)
+			shift
+			REGISTRY=$1
+			verbose "Using registry: $REGISTRY"
+			shift
+			;;
+		-B|--base)
+			shift
+			BASE=$1
+			verbose "Using base: $BASE"
+			shift
+			;;
+		-T|--tag)
+			shift
+			TAG=$1
+			verbose "Using tag: $TAG"
+			shift
+			;;
+		-P|--parent)
+			shift
+			PARENT=$1
+			verbose "Using parent: $PARENT"
+			shift
+			;;
+		-u|--user)
+			shift
+			CONTAINER_USER=$1
+			verbose "Using name: $CONTAINER_NAME"
+			shift
+			;;
+		-C|--control)
+			shift
+			HMM_CONTROL=$1
+			verbose "Using control: $HMM_CONTROL"
+			shift
+			;;
+	    --upgrade)
+            downloader
+            DOWNLOADER=$RETURN_HOLDER
+            mkdir /tmp/hmm
+            echo $DOWNLOADER /tmp/hmm/hmm.tar.gz http://hmm.comfreeze.net/hmm.tar.gz
+            $DOWNLOADER /tmp/hmm/hmm.tar.gz http://hmm.comfreeze.net/hmm.tar.gz
+            cd /tmp/hmm
+            if [[ -f hmm.tar.gz ]]; then
+                tar zxvf hmm.tar.gz
+                ./hmm install
+            fi
+            cd /tmp
+            rm -rf /tmp/hmm
+            cd $CUR_DIR
+	        exit 0
+	        ;;
+		*)
+			break
+			;;
+	esac
+done
+
+PORTS="$PORTS $ADD_PORTS"
+VOLUMES="$VOLUMES $ADD_VOLUMES"
+ENV_VARS="$ENV_VARS $ADD_ENV_VARS"
+
+#
+# Fully qualified name:
+# e.g. hostname.domain:port/repository:tag
+#
+export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )
+
+#
+# Friendly name:
+# e.g. my-cool-server-3.0
+#
+if [[ $CONTAINER_NAME = "" ]]; then
+    CONTAINER_NAME="$BASE"
+    if [[ ! $TAG = "" ]]; then
+        CONTAINER_NAME="$CONTAINER_NAME-$TAG"
+    fi
+fi
+if [[ $CONTAINER_USER = "" ]]; then
+    CONTAINER_USER="$USER"
+fi
+export CONTAINER_NAME
+
+#
+# Compiled launch parameters:
+# e.g. -p 80:80 -v /var/www -e APP_ENV=prod
+#
+export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
+export CONTAINER_SSH="$SSH_PORT"
+export CONTAINER_USER
+export PARENT
+export FORCE
+export HMM_DIR
+export RETURN_HOLDER
+export VERBOSE
+
+#
+# CLI User Interface
+#
+while test $# -gt 0; do
+	case "$1" in
+		-h|--help)
+			signature
+			usage
+			exit 0
+			;;
+		-i|--info)
+			signature
+			echo "SELF_PATH:      $SELF_PATH"
+			echo "HMM_DIR:        $HMM_DIR"
+			echo "HMM_CONFIG:     $HMM_CONFIG"
+			echo "PARENT:         $PARENT"
+			echo "REGISTRY:       $REGISTRY"
+			echo "BASE:           $BASE"
+			echo "TAG:            $TAG"
+			echo "DOCKER_NAME:    $DOCKER_NAME"
+			echo "CONTAINER_USER: $CONTAINER_USER"
+			echo "CONTAINER_NAME: $CONTAINER_NAME"
+			echo "CONTAINER_ARGS: $CONTAINER_ARGS"
+			exit 0
+			;;
+		-a|--actions)
+			signature
+			cd $SCRIPTS/
+			echo "Available actions:"
+			for ACTION_FILE in *
+			do
+				echo " * ${ACTION_FILE/$SCRIPTS\//}"
+			done
+			cd $CURDIR
+			exit 0
+			;;
+###MINIFY-ACTIONS###
+
+        attach)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+
+verbose "Attaching to $DOCKER_NAME with args: $CONTAINER_ARGS"
+$DOCKER_CMD attach $* $DOCKER_NAME
+
+            exit 0
+            ;;
+        build)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+
+if [ ! $PARENT = "" ]; then
+    $DOCKER_CMD pull $PARENT
+fi
+
+verbose "Building $DOCKER_NAME..."
+$DOCKER_CMD build $* -t $DOCKER_NAME .
+
+            exit 0
+            ;;
+        cleanup)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Destroying $CONTAINER_NAME..."
+$DOCKER_CMD rm $CONTAINER_NAME
+
+            exit 0
+            ;;
+        commit)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Committing $CONTAINER_NAME..."
+$DOCKER_CMD commit --pause=true --message=${2-"hmm commit"} $CONTAINER_NAME ${1-$DOCKER_NAME}
+
+            exit 0
+            ;;
+        control)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$HMM_CONTROL" "HMM_CONTROL not found!"
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+if [ $HMM_CONTROL = "nsenter" ]; then
+    container_pid
+    PID=$RETURN_HOLDER
+    verbose "Entering namespace for $CONTAINER_NAME (PID: $PID)"
+    CMD="sudo nsenter --target $PID --mount --uts --ipc --net --pid"
+else
+    not_empty $CONTAINER_USER "CONTAINER_USER not specified"
+    container_port 22
+    PORT=$RETURN_HOLDER
+    verbose "Remoting into $CONTAINER_NAME - $PORT"
+    CMD="ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT $CONTAINER_USER@localhost"
+fi
+
+$CMD $*
+
+            exit 0
+            ;;
+        enter)
+            shift
+
+# INCLUDED FILE CONTENT
+container_pid
+PID=$RETURN_HOLDER
+
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Entering namespace for $CONTAINER_NAME (PID: $PID)"
+nsenter --target $PID --mount --uts --ipc --net --pid $*
+
+            exit 0
+            ;;
+        export)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+container_image
+IMAGE=$RETURN_HOLDER
+
+verbose "Exporting $CONTAINER_NAME..."
+$DOCKER_CMD save -o ${1-$CONTAINER_NAME}.tar $IMAGE
+
+            exit 0
+            ;;
+        fork)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$GIT_CMD" "GIT_CMD not found!"
+not_empty "$1" "fork requires at least a target name"
+
+verbose "Creating new branch for $1"
+$GIT_CMD branch "$1"
+
+verbose "Switching to new branch: $1"
+$GIT_CMD checkout "$1"
+
+            exit 0
+            ;;
+        get-details)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Inspecting $CONTAINER_NAME..."
+
+docker inspect $* $CONTAINER_NAME
+
+            exit 0
+            ;;
+        get-http)
+            shift
+
+# INCLUDED FILE CONTENT
+container_port 80
+PORT=$RETURN_HOLDER
+verbose "http://localhost:$PORT"
+echo $PORT
+
+            exit 0
+            ;;
+        get-https)
+            shift
+
+# INCLUDED FILE CONTENT
+container_port 443
+PORT=$RETURN_HOLDER
+verbose "https://localhost:$PORT"
+echo $PORT
+
+            exit 0
+            ;;
+        get-image)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Finding current image for $CONTAINER_NAME"
+
+container_image
+IMAGE=$RETURN_HOLDER
+
+echo "$IMAGE"
+
+            exit 0
+            ;;
+        get-log)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Logging $DOCKER_NAME..."
+
+$DOCKER_CMD logs $* $CONTAINER_NAME
+
+            exit 0
+            ;;
+        get-pid)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Looking up PID for $CONTAINER_NAME..."
+
+container_pid
+PID=$RETURN_HOLDER
+echo $PID
+
+            exit 0
+            ;;
+        get-port)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Finding public port for $CONTAINER_NAME - $1"
+
+container_port $1
+PORT=$RETURN_HOLDER
+echo $PORT
+
+            exit 0
+            ;;
+        get-source)
+            shift
+
+# INCLUDED FILE CONTENT
+
+container_image
+IMAGE=$RETURN_HOLDER
+
+$DOCKER_CMD run -v /var/run/docker.sock:/var/run/docker.sock centurylink/dockerfile-from-image $DOCKER_NAME
+
+            exit 0
+            ;;
+        import)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+container_image
+IMAGE=$RETURN_HOLDER
+
+verbose "Importing $CONTAINER_NAME..."
+$DOCKER_CMD load -i ${1-$CONTAINER_NAME}.tar
+
+            exit 0
+            ;;
+        init)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Initializing local directory for hmm..."
+signature
+
+clean_config() {
+    rm -rf $HMM_CONFIG
+}
+
+real_config() {
+    verbose "Generating $HMM_CONFIG"
+    cat > $HMM_CONFIG <<EOF
+
+# Parent docker registry name for spawning/reference
+PARENT="${PARENT}"
+
+# Docker registry address (if not port 80, specify port)
+REGISTRY="$REGISTRY"
+
+# Base repository in the registry
+BASE="$BASE"
+
+# Target on the repository, version in big repos, tags in small
+TAG="$TAG"
+
+# Environment variable to inject (prefix each with -e ).  Format is "-e name=value".
+ENV_VARS="$ENV_VARS"
+
+# Volumes/directories to mount/expose (prefix each with -v ).  Format is "-v (local:)internal" and only exposed if local is not provided.
+VOLUMES="$VOLUMES"
+
+# Ports to forward/manage/redirect (prefix each with -p ).  Format is "-p (local:)port" where local is dynamic if not provided.
+PORTS="$PORTS"
+
+# Default username used in operations requiring one specified.
+CONTAINER_USER="$CONTAINER_USER"
+
+EOF
+    verbose "Generated $HMM_CONFIG"
+}
+
+#
+# Initialize configuration file
+#
+verify_install_replace \
+ "$HMM_CONFIG" \
+ clean_config \
+ real_config
+
+            exit 0
+            ;;
+        install)
+            shift
+
+# INCLUDED FILE CONTENT
+signature
+
+TYPE=local
+HMM_INSTALL_PATH=/usr/local/lib
+
+clean_install_local()       { sudo rm -rf "$HMM_INSTALL_PATH/hmm"; }
+real_install_local()        { mkdir -p "$HMM_INSTALL_PATH"; sudo cp -R "$HMM_DIR" "$HMM_INSTALL_PATH/."; }
+
+real_bashrc_local()         { echo "export PATH=$HMM_INSTALL_PATH/hmm:$PATH" >> $HOME/.bashrc;
+                              echo ". $HMM_INSTALL_PATH/hmm.bash" >> $HOME/.bashrc; }
+
+real_profile_local()        { echo "export PATH=$HMM_INSTALL_PATH/hmm:$PATH" >> $HOME/.bash_profile;
+                              echo ". $HMM_INSTALL_PATH/hmm.bash" >> $HOME/.bash_profile; }
+
+install_local() {
+    read -e -p "Where would you like HMM installed? " -i "$HOME/bin" HMM_INSTALL_PATH
+    echo " "
+    echo "Installing from $HMM_DIR to $HMM_INSTALL_PATH"
+    if [[ "$HMM_DIR" = "$HMM_INSTALL_PATH/hmm" ]]; then
+        echo "ERROR: Same directory!"
+        exit 1
+    fi
+    verify_install_replace \
+     "$HMM_INSTALL_PATH/hmm" \
+     clean_install_local \
+     real_install_local
+
+    read -n 1 -p "Append updates to $HOME/.bashrc? (y/n) "
+    echo " "
+    [ $REPLY = "n" ] || real_bashrc_local;
+
+    read -n 1 -p "Append updates to $HOME/.bash_profile? (y/n) "
+    echo " "
+    [ $REPLY = "n" ] || real_profile_local;
+
+    read -n 1 -p "Run bash completion setup now? (y/n) "
+    echo " "
+    [ $REPLY = "n" ] || /bin/bash "$HMM_INSTALL_PATH/hmm.bash";
+}
+
+clean_install_global()      { sudo rm -rf "$HMM_INSTALL_PATH/hmm"; }
+real_install_global()       { sudo cp -R "$HMM_DIR" "$HMM_INSTALL_PATH/hmm"; }
+
+clean_completion_global()   { sudo rm -rf /etc/bash_completion.d/hmm; }
+real_completion_global()    { sudo ln -s "$HMM_INSTALL_PATH/hmm/hmm.bash" /etc/bash_completion.d/hmm; }
+
+clean_path_global()         { sudo rm -rf /usr/local/bin/hmm; }
+real_path_global()          { sudo ln -s "$HMM_INSTALL_PATH/hmm/hmm" /usr/local/bin/hmm; }
+
+install_global() {
+    echo "Installing from $HMM_DIR to $HMM_INSTALL_PATH"
+    sudo mkdir -p $HMM_INSTALL_PATH
+    verify_install_replace \
+     "$HMM_INSTALL_PATH/hmm" \
+     clean_install_global \
+     real_install_global
+
+    sudo mkdir -p $HMM_INSTALL_PATH
+    verify_install_replace \
+     "/etc/bash_completion.d/hmm" \
+     clean_completion_global \
+     real_completion_global
+    /bin/bash /etc/bash_completion.d/hmm
+
+    sudo mkdir -p $HMM_INSTALL_PATH
+    verify_install_replace \
+     "/usr/local/bin/hmm" \
+     clean_path_global \
+     real_path_global
+}
+
+read -n 1 -p "What type of installation? (l)ocal, (g)lobal "
+echo " "
+[ $REPLY = "l" ] && install_local;
+[ $REPLY = "g" ] && install_global;
+
+            exit 0
+            ;;
+        kill)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Killing $CONTAINER_NAME..."
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+$DOCKER_CMD stop $CONTAINER_NAME
+$DOCKER_CMD rm $CONTAINER_NAME
+
+            exit 0
+            ;;
+        pull)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+
+verbose "Pulling $DOCKER_NAME..."
+$DOCKER_CMD pull $DOCKER_NAME
+
+            exit 0
+            ;;
+        push)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+
+verbose "Pushing $DOCKER_NAME..."
+$DOCKER_CMD push $DOCKER_NAME
+
+            exit 0
+            ;;
+        reload)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Stopping $DOCKER_NAME..."
+$DOCKER_CMD stop $CONTAINER_NAME
+
+verbose "Destroying $CONTAINER_NAME..."
+$DOCKER_CMD rm $CONTAINER_NAME
+
+verbose "Starting $DOCKER_NAME..."
+$DOCKER_CMD run$INTERACTIVE -t -d --name=$CONTAINER_NAME $CONTAINER_ARGS $* $DOCKER_NAME
+
+            exit 0
+            ;;
+        restart)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Starting $CONTAINER_NAME..."
+$DOCKER_CMD start $CONTAINER_NAME $*
+
+            exit 0
+            ;;
+        run)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
+$DOCKER_CMD run -a stdin -a stdout -a stderr$INTERACTIVE -t --rm=true --name=$CONTAINER_NAME $CONTAINER_ARGS $DOCKER_NAME "$*"
+
+            exit 0
+            ;;
+        serve)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+if [[ $CONTAINER_NAME = "" ]]; then
+    PARENT = $DOCKER_NAME
+fi
+not_empty "$PARENT" "PARENT is not defined!"
+
+$DOCKER_CMD run \
+ -d --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $PARENT $*
+
+            exit 0
+            ;;
+        snapshot)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Committing $CONTAINER_NAME..."
+$DOCKER_CMD commit $CONTAINER_NAME $DOCKER_NAME-snapshot
+
+            exit 0
+            ;;
+        spawn)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+if [[ $CONTAINER_NAME = "" ]]; then
+    PARENT = $DOCKER_NAME
+fi
+not_empty "$PARENT" "PARENT is not defined!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ $CONTAINER_ARGS \
+ $PARENT "$*"
+
+            exit 0
+            ;;
+        ssh)
+            shift
+
+# INCLUDED FILE CONTENT
+container_port 22
+PORT=$RETURN_HOLDER
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+not_empty "$CONTAINER_USER" "CONTAINER_USER empty!"
+
+verbose "Remoting into $CONTAINER_NAME - $PORT"
+ssh -t -o "LogLevel QUIET" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -p $PORT $CONTAINER_USER@localhost $*
+
+            exit 0
+            ;;
+        start)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Launching $DOCKER_NAME with args: $CONTAINER_ARGS"
+$DOCKER_CMD run$INTERACTIVE -t -d --name=$CONTAINER_NAME $CONTAINER_ARGS $* $DOCKER_NAME
+
+            exit 0
+            ;;
+        status)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+verbose "Checking status of $CONTAINER_NAME"
+if [[ ! $CONTAINER_NAME = "" ]]; then
+    $DOCKER_CMD ps | grep $CONTAINER_NAME
+else
+    $DOCKER_CMD ps
+fi
+
+            exit 0
+            ;;
+        stop)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Stopping $CONTAINER_NAME..."
+$DOCKER_CMD stop $CONTAINER_NAME
+
+            exit 0
+            ;;
+        tag)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+container_image
+IMAGE=$RETURN_HOLDER
+
+verbose "Tagging $CONTAINER_NAME..."
+$DOCKER_CMD tag $IMAGE $DOCKER_NAME-${1-"tag"}
+
+            exit 0
+            ;;
+        *)
+			if [[ -f "$SCRIPTS/$1" ]]; then
+				ACTION="$SCRIPTS/$1"
+				verbose "ACTION: $ACTION"
+				shift
+			fi
+            break
+            ;;
+	esac
+done
+
+if [ "$ACTION" != "" ]; then
+	/bin/bash "$ACTION" $*
+#	exit 0
+else
+	usage
+	exit 0
+fi
+
+# echo $CONTAINER_ARGS

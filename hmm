@@ -8,7 +8,7 @@ VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
 UPDATE=false
-DOCKER_HOST=dockers.comfreeze.net
+DHOST=dockers.comfreeze.net
 PLATFORM=alpine
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
 
@@ -414,8 +414,8 @@ while test $# -gt 0; do
 			;;
 		-o|--host)
 			shift
-			DOCKER_HOST=$1
-			verbose "Using host: $DOCKER_HOST"
+			DHOST=$1
+			verbose "Using host: $DHOST"
 			shift
 			;;
 		-L|--platform)
@@ -496,7 +496,7 @@ export CONTAINER_NAME
 export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES $LINKING"
 export CONTAINER_SSH="$SSH_PORT"
 export CONTAINER_USER
-export DOCKER_HOST
+export DHOST
 export PLATFORM
 export PARENT
 export FORCE
@@ -507,7 +507,7 @@ export RETURN_HOLDER
 export VERBOSE
 export TAG
 
-BASE_OS=$DOCKER_HOST/$PLATFORM
+BASE_OS=$DHOST/$PLATFORM
 
 #
 # CLI User Interface
@@ -525,7 +525,7 @@ while test $# -gt 0; do
 			echo "HMM_DIR:        $HMM_DIR"
 			echo "HMM_CONFIG:     $HMM_CONFIG"
 			echo "PARENT:         $PARENT"
-			echo "HOST:           $DOCKER_HOST"
+			echo "HOST:           $DHOST"
 			echo "PLATFORM:       $PLATFORM"
 			echo "BASE OS:        $BASE_OS"
 			echo "REGISTRY:       $REGISTRY"
