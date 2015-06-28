@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=0.8.0
+VERSION=0.8.1
 
 #
 # Global defaults
@@ -118,25 +118,26 @@ container_image() {
 get_actions() {
     TARGET=$1
     RESULT=""
-    cd $TARGET/
+    cd ${TARGET}/
     for ACTION_FILE in *
     do
-    	if [[ -f $ACTION_FILE ]]; then
-        	[[ $RESULT = "" ]] || RESULT+=","
+    	if [[ -f ${ACTION_FILE} ]]; then
+        	[[ ${RESULT} = "" ]] || RESULT+=","
         	RESULT+="${ACTION_FILE/$SCRIPTS\//}"
         fi
 
-        if [[ -d $ACTION_FILE ]]; then
-            cd $ACTION_FILE
+        if [[ -d ${ACTION_FILE} ]]; then
+            cd ${ACTION_FILE}
             for SUB_ACTION_FILE in *
             do
-                [[ $RESULT = "" ]] || RESULT+=","
+                [[ ${RESULT} = "" ]] || RESULT+=","
                 RESULT+="${ACTION_FILE/$SCRIPTS\//}-$SUB_ACTION_FILE"
 			done
 			cd ..
 		fi
     done
-    RETURN_HOLDER=$RESULT
+    cd ${CURDIR}
+    RETURN_HOLDER=${RESULT}
     return
 }
 #
