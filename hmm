@@ -112,6 +112,7 @@ container_image() {
     RETURN_HOLDER=$RESULT
     return
 }
+
 #
 # Actions List
 #
@@ -140,6 +141,7 @@ get_actions() {
     RETURN_HOLDER=${RESULT}
     return
 }
+
 #
 # Installation helper - verify replace
 #

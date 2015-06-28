@@ -12,6 +12,10 @@
 PLUGDIR=""
 CURDIR=$( pwd )
 
+signature() {
+	printf "\n$(tput bold)$(tput setaf 4)-[$(tput setaf 6)CFZ$(tput setaf 4)]- $(tput setaf 1)H$(tput sgr0)eadworks $(tput setaf 1)M$(tput sgr0)achination $(tput setaf 1)M$(tput sgr0)anagement$(tput sgr0) - v$VERSION"
+}
+
 get_actions() {
     TARGET=$1
     RESULT=""
@@ -77,6 +81,7 @@ long_opts()
     #  The basic options we'll complete.
     #
     opts=" \
+###MINIFY-ACTIONS###
     --help \
     --info \
     --actions \
@@ -102,12 +107,13 @@ long_opts()
     --control \
     --upgrade \
     --path";
-    RETURN_HOLDER=${opts}
+    RETURN_HOLDER=${opts/###MINIFY-ACTIONS###/}
     return
 }
 
 _hmm()
 {
+#    signature
     local cur prev opts actions
     cur="${COMP_WORDS[COMP_CWORD]}"
     PREV_CWORD=${COMP_CWORD}-1

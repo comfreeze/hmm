@@ -7,19 +7,66 @@ BASH_COMPLETE=""
 BASH_COMMANDS=""
 FILENAME=""
 
-for SCRIPT in $SCRIPTS/*; do
-    FILENAME="${SCRIPT/$SCRIPTS\//}"
-    BASH_COMPLETE+=" ${FILENAME}"
-    BASH_COMMANDS+="
+#
+# Actions List
+#
+get_actions() {
+    TARGET=$1
+    RESULT=""
+    cd ${TARGET}/
+    for ACTION_FILE in *
+    do
+    	if [[ -f ${ACTION_FILE} ]]; then
+        	FILENAME="${ACTION_FILE/$SCRIPTS\//}"
+            BASH_COMPLETE+=" ${FILENAME}"
+            BASH_COMMANDS+="
         ${FILENAME})
             shift
 
 # INCLUDED FILE CONTENT
-$( tail -n +2 $SCRIPT )
+$( tail -n +2 "$TARGET/$ACTION_FILE" )
 
             exit 0
             ;;"
-done
+        fi
+
+        if [[ -d ${ACTION_FILE} ]]; then
+            cd ${ACTION_FILE}
+            for SUB_ACTION_FILE in *
+            do
+                FILENAME="${ACTION_FILE/$SCRIPTS\//}"
+                BASH_COMPLETE+=" ${FILENAME}-$SUB_ACTION_FILE"
+                BASH_COMMANDS+="
+        ${FILENAME}-$SUB_ACTION_FILE)
+            shift
+
+# INCLUDED FILE CONTENT
+$( tail -n +2 "$TARGET/$ACTION_FILE/$SUB_ACTION_FILE" )
+
+            exit 0
+            ;;"
+			done
+			cd ..
+		fi
+    done
+    cd ${HMM_DIR}
+}
+
+#for SCRIPT in $SCRIPTS/*; do
+#    FILENAME="${SCRIPT/$SCRIPTS\//}"
+#    BASH_COMPLETE+=" ${FILENAME}"
+#    BASH_COMMANDS+="
+#        ${FILENAME})
+#            shift
+#
+## INCLUDED FILE CONTENT
+#$( tail -n +2 $SCRIPT )
+#
+#            exit 0
+#            ;;"
+#done
+
+get_actions ${SCRIPTS}
 
 BASH_COMPLETE+=" \\"
 

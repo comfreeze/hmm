@@ -1,8 +1,15 @@
 #!/bin/bash
-VERSION=0.3.1
+VERSION=0.8.1
+
+#
+# Global defaults
+#
 VERBOSE=false
 RETURN_HOLDER=
 FORCE=false
+UPDATE=false
+DHOST=dockers.comfreeze.net
+PLATFORM=alpine
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
 
 while [ -h "$SELF_PATH" ]; do
@@ -32,6 +39,7 @@ hmm [feature] [params] action [options]
    -i, --info          Show defined contants
    -F, --force         Manually force an operation, if allowed
    -V, --verbose       Enable debug messaging
+   -U, --update        Update the base image powering the command
    --path              Display HMM home path
 
  PARAMS:
@@ -104,21 +112,36 @@ container_image() {
     RETURN_HOLDER=$RESULT
     return
 }
+
 #
 # Actions List
 #
 get_actions() {
+    TARGET=$1
     RESULT=""
-    cd $SCRIPTS/
+    cd ${TARGET}/
     for ACTION_FILE in *
     do
-        [[ $RESULT = "" ]] || RESULT+=","
-        RESULT+="${ACTION_FILE/$SCRIPTS\//}"
+    	if [[ -f ${ACTION_FILE} ]]; then
+        	[[ ${RESULT} = "" ]] || RESULT+=","
+        	RESULT+="${ACTION_FILE/$SCRIPTS\//}"
+        fi
+
+        if [[ -d ${ACTION_FILE} ]]; then
+            cd ${ACTION_FILE}
+            for SUB_ACTION_FILE in *
+            do
+                [[ ${RESULT} = "" ]] || RESULT+=","
+                RESULT+="${ACTION_FILE/$SCRIPTS\//}-$SUB_ACTION_FILE"
+			done
+			cd ..
+		fi
     done
-    cd $CURDIR
-    RETURN_HOLDER=$RESULT
+    cd ${CURDIR}
+    RETURN_HOLDER=${RESULT}
     return
 }
+
 #
 # Installation helper - verify replace
 #
@@ -144,6 +167,16 @@ verify_install_replace() {
     else
         $INSTALL
     fi
+}
+#
+# Update image helper
+#
+update_current_image() {
+	IMAGE_NAME=$1
+	if [[ $UPDATE = true ]]; then
+		echo "Updating image for $IMAGE_NAME"
+		$DOCKER_CMD pull $IMAGE_NAME
+	fi
 }
 #
 # Download app locator
@@ -173,6 +206,7 @@ export -f container_port
 export -f container_image
 export -f get_actions
 export -f verify_install_replace
+export -f update_current_image
 
 #
 # Command references
@@ -185,6 +219,7 @@ else
 fi
 export GIT_CMD="git"
 export DOCKER_CMD
+export BASE_OS
 
 #
 # Directory specifications:
@@ -201,7 +236,28 @@ export SCRIPTS="${HMM_DIR}/.hmm"
 verbose "HMM_DIR=$HMM_DIR"
 verbose "SCRIPTS=$SCRIPTS"
 verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
-verbose "Remaining OPTS: $opts"
+
+#
+# Configure interactivity
+#
+if [ -t "$fd" ]; then
+    verbose "Interactive"
+	INTERACTIVE="-a stdin -a stdout -a stderr -i"
+else
+	verbose "Non-interative"
+	INTERACTIVE=""
+fi
+
+export INTERACTIVE
+
+#
+# Test first argument for config alias
+#
+if [ -f "$1.hmm" ]; then
+    verbose "Config alias matched, using config $1.hmm..."
+    export HMM_CONFIG=${CURDIR}/${1}.hmm
+    shift
+fi
 
 #
 # Includes
@@ -220,6 +276,10 @@ fi
 #
 while test $# -gt 0; do
 	case "$1" in
+		-U|--update)
+			UPDATE=true
+			shift
+			;;
 	    -F|--force)
 	        FORCE=true
 	        shift
@@ -261,6 +321,23 @@ while test $# -gt 0; do
 		--port*)
 			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
 			PORTS+=" -p $DATA"
+			shift
+			;;
+	    -l)
+	        shift
+	        if test $# -gt 0; then
+	            verbose "Linking $opt"
+	            LINKING+=" --link $1"
+            else
+                verbose "ERROR no alias specified"
+                usage
+                exit 1
+            fi
+	        shift
+	        ;;
+		--link*)
+			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
+			LINKING+=" --link $DATA"
 			shift
 			;;
 		-v)
@@ -309,6 +386,12 @@ while test $# -gt 0; do
 			verbose "Using registry: $REGISTRY"
 			shift
 			;;
+		-r|--run)
+			shift
+			RUN_CMD=$1
+			verbose "Using command: $RUN_CMD"
+			shift
+			;;
 		-B|--base)
 			shift
 			BASE=$1
@@ -321,16 +404,33 @@ while test $# -gt 0; do
 			verbose "Using tag: $TAG"
 			shift
 			;;
+		-t|--test)
+			DOCKER_CMD="echo docker"
+			verbose "Testing only"
+			shift
+			;;
 		-P|--parent)
 			shift
 			PARENT=$1
 			verbose "Using parent: $PARENT"
 			shift
 			;;
+		-o|--host)
+			shift
+			DHOST=$1
+			verbose "Using host: $DHOST"
+			shift
+			;;
+		-L|--platform)
+			shift
+			PLATFORM=$1
+			verbose "Using platform: $PLATFORM"
+			shift
+			;;
 		-u|--user)
 			shift
 			CONTAINER_USER=$1
-			verbose "Using name: $CONTAINER_NAME"
+			verbose "Using username: $CONTAINER_USER"
 			shift
 			;;
 		-C|--control)
@@ -362,14 +462,20 @@ while test $# -gt 0; do
 done
 
 PORTS="$PORTS $ADD_PORTS"
+LINKING="$LINKING $ADD_LINKING"
 VOLUMES="$VOLUMES $ADD_VOLUMES"
 ENV_VARS="$ENV_VARS $ADD_ENV_VARS"
+
+#
+# Simplified name without tag
+#
+export DOCKER_BASE="$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}"
 
 #
 # Fully qualified name:
 # e.g. hostname.domain:port/repository:tag
 #
-export DOCKER_NAME=$([ "$REGISTRY" == "" ] && echo "" || echo "$REGISTRY/" )${BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )
+export DOCKER_NAME="${DOCKER_BASE}$([ "$TAG" == "" ] && echo "" || echo ":$TAG" )"
 
 #
 # Friendly name:
@@ -390,14 +496,21 @@ export CONTAINER_NAME
 # Compiled launch parameters:
 # e.g. -p 80:80 -v /var/www -e APP_ENV=prod
 #
-export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES"
+export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES $LINKING"
 export CONTAINER_SSH="$SSH_PORT"
 export CONTAINER_USER
+export DHOST
+export PLATFORM
 export PARENT
 export FORCE
+export UPDATE
+export RUN_CMD
 export HMM_DIR
 export RETURN_HOLDER
 export VERBOSE
+export TAG
+
+BASE_OS=$DHOST/$PLATFORM
 
 #
 # CLI User Interface
@@ -415,9 +528,13 @@ while test $# -gt 0; do
 			echo "HMM_DIR:        $HMM_DIR"
 			echo "HMM_CONFIG:     $HMM_CONFIG"
 			echo "PARENT:         $PARENT"
+			echo "HOST:           $DHOST"
+			echo "PLATFORM:       $PLATFORM"
+			echo "BASE OS:        $BASE_OS"
 			echo "REGISTRY:       $REGISTRY"
 			echo "BASE:           $BASE"
 			echo "TAG:            $TAG"
+			echo "RUN_CMD:        $RUN_CMD"
 			echo "DOCKER_NAME:    $DOCKER_NAME"
 			echo "CONTAINER_USER: $CONTAINER_USER"
 			echo "CONTAINER_NAME: $CONTAINER_NAME"
@@ -426,13 +543,12 @@ while test $# -gt 0; do
 			;;
 		-a|--actions)
 			signature
-			cd $SCRIPTS/
+			get_actions "$SCRIPTS/"
 			echo "Available actions:"
-			for ACTION_FILE in *
+			for ACTION_FILE in $RETURN_HOLDER
 			do
-				echo " * ${ACTION_FILE/$SCRIPTS\//}"
+				echo "${ACTION_FILE}" | tr "," "\n" | column
 			done
-			cd $CURDIR
 			exit 0
 			;;
 ###MINIFY-ACTIONS###
@@ -458,9 +574,9 @@ $DOCKER_CMD attach $* $DOCKER_NAME
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
 
-if [ ! $PARENT = "" ]; then
-    $DOCKER_CMD pull $PARENT
-fi
+# if [ ! $PARENT = "" ]; then
+#     $DOCKER_CMD pull $PARENT
+# fi
 
 verbose "Building $DOCKER_NAME..."
 $DOCKER_CMD build $* -t $DOCKER_NAME .
@@ -477,6 +593,324 @@ not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Destroying $CONTAINER_NAME..."
 $DOCKER_CMD rm $CONTAINER_NAME
+
+            exit 0
+            ;;
+        cli-bower)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:yeoman
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'grunt $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "bower --config.analytics=false $*"
+
+            exit 0
+            ;;
+        cli-composer)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:php5-cli
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'php $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "composer $*"
+
+            exit 0
+            ;;
+        cli-couchjs)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:couchdb
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'couchjs $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "/usr/bin/couchjs $*"
+
+            exit 0
+            ;;
+        cli-grunt)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:yeoman
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'grunt $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ $INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "grunt $*"
+
+            exit 0
+            ;;
+        cli-gulp)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:grunt
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'grunt $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "gulp $*"
+
+            exit 0
+            ;;
+        cli-jxcore)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:jxcore
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'node $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "jx $*"
+
+            exit 0
+            ;;
+        cli-laravel)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:php5-cli
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'php $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "~/.composer/vendor/bin/laravel $*"
+
+            exit 0
+            ;;
+        cli-mean)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:mean-cli
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'node $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "/usr/bin/mean $*"
+
+            exit 0
+            ;;
+        cli-meteor)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:meteor
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'grunt $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "meteor $*"
+
+            exit 0
+            ;;
+        cli-mongo)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:mongo
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'mongo $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "/usr/bin/mongo $*"
+
+            exit 0
+            ;;
+        cli-nodejs)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:nodejs
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'node $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "/usr/bin/node $*"
+
+            exit 0
+            ;;
+        cli-npm)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:nodejs
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'npm $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "/usr/local/bin/npm $*"
+
+            exit 0
+            ;;
+        cli-php)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:php5-cli
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'php $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "php $*"
+
+            exit 0
+            ;;
+        cli-sh)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:yeoman
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'sh $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "/bin/sh $*"
+
+            exit 0
+            ;;
+        cli-yo)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:yeoman
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'grunt $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "yo $*"
+
+            exit 0
+            ;;
+        cli-zf)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:zend-framework-cli
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'php $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ -v "$( pwd ):/webroot" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "/usr/bin/zf $*"
 
             exit 0
             ;;
@@ -530,7 +964,7 @@ PID=$RETURN_HOLDER
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Entering namespace for $CONTAINER_NAME (PID: $PID)"
-nsenter --target $PID --mount --uts --ipc --net --pid $*
+sudo nsenter --target $PID --mount --uts --ipc --net --pid $*
 
             exit 0
             ;;
@@ -711,8 +1145,14 @@ VOLUMES="$VOLUMES"
 # Ports to forward/manage/redirect (prefix each with -p ).  Format is "-p (local:)port" where local is dynamic if not provided.
 PORTS="$PORTS"
 
+# Links to other containers (prefix each with --link ).  Format is "-p (source:)alias" where source is container name/tag provided.
+LINKING="$LINKING"
+
 # Default username used in operations requiring one specified.
 CONTAINER_USER="$CONTAINER_USER"
+
+# Command to run for compliant systems that will support it
+RUN_CMD="/bin/bash"
 
 EOF
     verbose "Generated $HMM_CONFIG"
@@ -770,6 +1210,8 @@ install_local() {
     read -n 1 -p "Run bash completion setup now? (y/n) "
     echo " "
     [ $REPLY = "n" ] || /bin/bash "$HMM_INSTALL_PATH/hmm.bash";
+
+    chmod a+rx "HMM_INSTALL_PATH" -R
 }
 
 clean_install_global()      { sudo rm -rf "$HMM_INSTALL_PATH/hmm"; }
@@ -801,6 +1243,8 @@ install_global() {
      "/usr/local/bin/hmm" \
      clean_path_global \
      real_path_global
+
+    sudo chmod a+rx "/usr/local/bin/hmm" -R
 }
 
 read -n 1 -p "What type of installation? (l)ocal, (g)lobal "
@@ -837,6 +1281,22 @@ $DOCKER_CMD pull $DOCKER_NAME
 
             exit 0
             ;;
+        purge)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+#not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+
+verbose "Purging local docker storage..."
+
+$DOCKER_CMD ps -a --no-trunc=true | grep 'Exit' | awk '{print $1}' | xargs -L 1 -r $DOCKER_CMD rm
+
+$DOCKER_CMD images -a --no-trunc=true | awk '{print $3}' | xargs $DOCKER_CMD rmi -f
+
+            exit 0
+            ;;
         push)
             shift
 
@@ -866,7 +1326,35 @@ verbose "Destroying $CONTAINER_NAME..."
 $DOCKER_CMD rm $CONTAINER_NAME
 
 verbose "Starting $DOCKER_NAME..."
-$DOCKER_CMD run$INTERACTIVE -t -d --name=$CONTAINER_NAME $CONTAINER_ARGS $* $DOCKER_NAME
+$DOCKER_CMD run \
+$INTERACTIVE -t -d \
+ --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $* \
+ $DOCKER_NAME
+
+            exit 0
+            ;;
+        respawn)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+if [[ $CONTAINER_NAME = "" ]]; then
+    PARENT = $DOCKER_NAME
+fi
+not_empty "$PARENT" "PARENT is not defined!"
+
+$DOCKER_CMD stop $CONTAINER_NAME
+$DOCKER_CMD rm $CONTAINER_NAME
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ $CONTAINER_ARGS \
+ $PARENT \
+ "$*"
 
             exit 0
             ;;
@@ -893,15 +1381,307 @@ not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
-$DOCKER_CMD run -a stdin -a stdout -a stderr$INTERACTIVE -t --rm=true --name=$CONTAINER_NAME $CONTAINER_ARGS $DOCKER_NAME "$*"
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $DOCKER_NAME \
+ "$*"
 
             exit 0
             ;;
-        serve)
+        run-parent)
             shift
 
 # INCLUDED FILE CONTENT
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
 verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
+$DOCKER_CMD run  \
+$INTERACTIVE -t --rm=true \
+ --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $PARENT \
+ "$*"
+
+            exit 0
+            ;;
+        server-couchdb)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:couchdb
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running CouchDB with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -p 5984 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE $*
+
+            exit 0
+            ;;
+        server-express)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:express
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'node $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/workspace" \
+ -p 3000 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "node $*"
+
+            exit 0
+            ;;
+        server-grunt)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:grunt
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'grunt serve $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/overlay" \
+ -p 9000 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "grunt serve $*"
+
+            exit 0
+            ;;
+        server-html)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:nginx
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running NGINX with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/webroot" \
+ -p 80 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE
+
+            exit 0
+            ;;
+        server-jenkins)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:jenkins
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running NGINX + PHP5 with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/var/lib/jenkins" \
+ -p 8080 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE
+
+            exit 0
+            ;;
+        server-jsbin)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:jsbin
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running NGINX + PHP5 with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/overlay" \
+ -p 20100:20100 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE
+
+            exit 0
+            ;;
+        server-meteor)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:meteor
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'grunt serve $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/overlay" \
+ -p 3000 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "meteor"
+
+            exit 0
+            ;;
+        server-mongo)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:mongo
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running MongoDB with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -p 27017 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE $*
+
+            exit 0
+            ;;
+        server-mysql)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:mysql
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Starting MySQL server with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE
+
+            exit 0
+            ;;
+        server-nodejs)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:nodejs
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'grunt serve $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/overlay" \
+ -p 80 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "node $*"
+
+            exit 0
+            ;;
+        server-php)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:nginx-php5fpm
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running NGINX + PHP5 with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/webroot" \
+ -p 80 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE
+
+            exit 0
+            ;;
+        server-pma)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:phpmyadmin
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running NGINX + PHP5 with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/webroot" \
+ -p 80 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE
+
+            exit 0
+            ;;
+        server-redis)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:redis
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Starting Redis server with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/overlay" \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE
+
+            exit 0
+            ;;
+        server-restart)
+            shift
+
+# INCLUDED FILE CONTENT
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
@@ -910,10 +1690,54 @@ if [[ $CONTAINER_NAME = "" ]]; then
 fi
 not_empty "$PARENT" "PARENT is not defined!"
 
+$DOCKER_CMD stop $CONTAINER_NAME
+$DOCKER_CMD rm $CONTAINER_NAME
+
 $DOCKER_CMD run \
  -d --name=$CONTAINER_NAME \
  $CONTAINER_ARGS \
- $PARENT $*
+ $PARENT \
+ $*
+
+            exit 0
+            ;;
+        server-socketio)
+            shift
+
+# INCLUDED FILE CONTENT
+SOURCE_IMAGE=$BASE_OS:socketio
+
+update_current_image $SOURCE_IMAGE
+
+verbose "Running 'node $*' with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+
+$DOCKER_CMD run \
+ --rm=true \
+ -v "$( pwd ):/overlay" \
+ -p 80 \
+ $CONTAINER_ARGS \
+ $SOURCE_IMAGE "node $*"
+
+            exit 0
+            ;;
+        server-start)
+            shift
+
+# INCLUDED FILE CONTENT
+verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$PARENT" "PARENT is not defined!"
+
+update_current_image $PARENT
+
+$DOCKER_CMD run \
+ -d --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $PARENT \
+ "$RUN_CMD $*"
 
             exit 0
             ;;
@@ -938,16 +1762,15 @@ $DOCKER_CMD commit $CONTAINER_NAME $DOCKER_NAME-snapshot
 verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
-not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
-if [[ $CONTAINER_NAME = "" ]]; then
-    PARENT = $DOCKER_NAME
-fi
 not_empty "$PARENT" "PARENT is not defined!"
+
+update_current_image $PARENT
 
 $DOCKER_CMD run  \
 $INTERACTIVE -t --rm=true \
  $CONTAINER_ARGS \
- $PARENT "$*"
+ $PARENT \
+ "$RUN_CMD $*"
 
             exit 0
             ;;
@@ -977,7 +1800,13 @@ not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Launching $DOCKER_NAME with args: $CONTAINER_ARGS"
-$DOCKER_CMD run$INTERACTIVE -t -d --name=$CONTAINER_NAME $CONTAINER_ARGS $* $DOCKER_NAME
+$DOCKER_CMD run \
+$INTERACTIVE -t -d \
+ --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $* \
+ $DOCKER_NAME \
+ "$RUN_CMD"
 
             exit 0
             ;;
@@ -1016,22 +1845,41 @@ $DOCKER_CMD stop $CONTAINER_NAME
 # INCLUDED FILE CONTENT
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
-not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$DOCKER_BASE" "$DOCKER_BASE not found!"
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 container_image
 IMAGE=$RETURN_HOLDER
 
-verbose "Tagging $CONTAINER_NAME..."
-$DOCKER_CMD tag $IMAGE $DOCKER_NAME-${1-"tag"}
+verbose "Tagging $CONTAINER_NAME as ${DOCKER_BASE}:${1-$TAG}..."
+$DOCKER_CMD tag --force=true $IMAGE ${DOCKER_BASE}:${1-$TAG}
+
+            exit 0
+            ;;
+        update)
+            shift
+
+# INCLUDED FILE CONTENT
+
+not_empty "$GIT_CMD" "GIT_CMD not found!"
+
+$GIT_CMD fetch
+
+$GIT_CMD submodule init
+$GIT_CMD submodule update --recursive
 
             exit 0
             ;;
         *)
-			if [[ -f "$SCRIPTS/$1" ]]; then
-				ACTION="$SCRIPTS/$1"
+            # Allow nested directories
+            CMD_TARGET="${1//-/\/}"
+            verbose "Trying action: ${CMD_TARGET}"
+			if [[ -f "$SCRIPTS/$CMD_TARGET" ]]; then
+				ACTION="$SCRIPTS/$CMD_TARGET"
 				verbose "ACTION: $ACTION"
 				shift
+			else
+				echo "Unrecognized action: $1"
 			fi
             break
             ;;
