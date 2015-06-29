@@ -1,15 +1,10 @@
 #!/bin/bash
-SOURCE_IMAGE=$BASE_OS:nginx
+SOURCE_IMAGE=${BASE_OS}:nginx
+add_port 80
+add_volume "$( pwd ):/webroot"
 
-update_current_image $SOURCE_IMAGE
-
-verbose "Running NGINX with args: $CONTAINER_ARGS"
+update_current_image ${SOURCE_IMAGE}
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-$DOCKER_CMD run \
- --rm=true \
- -v "$( pwd ):/webroot" \
- -p 80 \
- $CONTAINER_ARGS \
- $SOURCE_IMAGE
+server_command ${SOURCE_IMAGE}

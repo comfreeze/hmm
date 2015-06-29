@@ -1,15 +1,9 @@
 #!/bin/bash
 SOURCE_IMAGE=$BASE_OS:nodejs
+add_port 80
 
 update_current_image $SOURCE_IMAGE
 
-verbose "Running 'grunt serve $*' with args: $CONTAINER_ARGS"
-
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-$DOCKER_CMD run \
- --rm=true \
- -v "$( pwd ):/overlay" \
- -p 80 \
- $CONTAINER_ARGS \
- $SOURCE_IMAGE "node $*"
+server_command $SOURCE_IMAGE "node $*"

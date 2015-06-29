@@ -194,10 +194,43 @@ downloader() {
     fi
 }
 #
+# Assemble container arguments
+#
+container_arguments() {
+    RETURN_HOLDER="$ENV_VARS $PORTS $VOLUMES $LINKING"
+    return
+}
+#
+# Add new environment variable
+#
+add_env_var() {
+    ENV_VARS+=" -e $1"
+}
+#
+# Attach a new port exposure/assignment
+#
+add_port() {
+    PORTS+=" -p $1"
+}
+#
+# Attach a new volume
+#
+add_volume() {
+    VOLUMES+=" -v $1"
+}
+#
+# Add a container link
+#
+add_link() {
+    LINKING+=" --link $1"
+}
+#
 # Core run command with args
 #
-base_command() {
+exec_base() {
     verbose "RAW: $*"
+    container_arguments
+    CONTAINER_ARGS=${RETURN_HOLDER}
     RETURN_HOLDER="$DOCKER_CMD run $INTERACTIVE -t --rm=true -v $( pwd ):/overlay $CONTAINER_ARGS $1"
     return
 }
@@ -208,8 +241,31 @@ exec_command() {
     SOURCE="$1"
     shift
     COMMAND="$*"
-    verbose "Running '$COMMAND' with args: $CONTAINER_ARGS"
-    base_command "$SOURCE"
+    verbose "Running '$COMMAND'"
+    exec_base "$SOURCE"
+    HMM_COMMAND="${RETURN_HOLDER}"
+    verbose "$HMM_COMMAND \"${COMMAND}\""
+    ${HMM_COMMAND} "${COMMAND}"
+}
+#
+# Core run server with args
+#
+server_base() {
+    verbose "RAW: $*"
+    container_arguments
+    CONTAINER_ARGS=${RETURN_HOLDER}
+    RETURN_HOLDER="$DOCKER_CMD run --rm=true -v $( pwd ):/overlay $CONTAINER_ARGS $1"
+    return
+}
+#
+# Run a server with args
+#
+server_command() {
+    SOURCE="$1"
+    shift
+    COMMAND="$*"
+    verbose "Serving '$COMMAND'"
+    server_base "$SOURCE"
     HMM_COMMAND="${RETURN_HOLDER}"
     verbose "$HMM_COMMAND \"${COMMAND}\""
     ${HMM_COMMAND} "${COMMAND}"
@@ -228,8 +284,15 @@ export -f container_image
 export -f get_actions
 export -f verify_install_replace
 export -f update_current_image
-export -f base_command
+export -f container_arguments
+export -f add_env_var
+export -f add_port
+export -f add_volume
+export -f add_link
+export -f exec_base
 export -f exec_command
+export -f server_base
+export -f server_command
 #
 # Command references
 # Alias new versions hack
@@ -332,8 +395,8 @@ while test $# -gt 0; do
 		-p)
 			shift
 			if test $# -gt 0; then
-				verbose "Setting $opt"
-				PORTS+=" -p $1"
+			    verbose "Setting $1"
+			    add_port $1
 			else
 				verbose "ERROR No port specified"
 				usage
@@ -343,14 +406,14 @@ while test $# -gt 0; do
 			;;
 		--port*)
 			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			PORTS+=" -p $DATA"
+			add_port ${DATA}
 			shift
 			;;
 	    -l)
 	        shift
 	        if test $# -gt 0; then
-	            verbose "Linking $opt"
-	            LINKING+=" --link $1"
+	            verbose "Linking $1"
+	            add_link $1
             else
                 verbose "ERROR no alias specified"
                 usage
@@ -360,14 +423,14 @@ while test $# -gt 0; do
 	        ;;
 		--link*)
 			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			LINKING+=" --link $DATA"
+			add_link ${DATA}
 			shift
 			;;
 		-v)
 			shift
 			if test $# -gt 0; then
 				verbose "Setting $1"
-				VOLUMES+=" -v $1"
+				add_volume $1
 			else
 				verbose "ERROR: No port specified"
 				usage
@@ -377,14 +440,14 @@ while test $# -gt 0; do
 			;;
 		--vol*)
 			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			VOLUMES+=" -v $DATA"
+			add_volume $DATA
 			shift
 			;;
 		-e)
 			shift
 			if test $# -gt 0; then
 				verbose "Setting $1"
-				ENV_VARS+=" -e $1"
+				add_env_var $1
 			else
 				verbose "ERROR: No var specified"
 				usage
@@ -394,7 +457,7 @@ while test $# -gt 0; do
 			;;
 		--env*)
 			DATA=`echo $1 | sed -e 's/^[^=]*=//g'`
-			ENV_VARS=" -e $DATA"
+			add_env_var $DATA
 			shift
 			;;
 		-n|--name)
@@ -519,7 +582,9 @@ export CONTAINER_NAME
 # Compiled launch parameters:
 # e.g. -p 80:80 -v /var/www -e APP_ENV=prod
 #
-export CONTAINER_ARGS="$ENV_VARS $PORTS $VOLUMES $LINKING"
+container_arguments
+CONTAINER_ARGS=${RETURN_HOLDER}
+export CONTAINER_ARGS
 export CONTAINER_SSH="$SSH_PORT"
 export CONTAINER_USER
 export DHOST

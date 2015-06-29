@@ -1,15 +1,10 @@
 #!/bin/bash
-SOURCE_IMAGE=$BASE_OS:jenkins
+SOURCE_IMAGE=${BASE_OS}:jenkins
+add_port 8080
+add_volume "$( pwd ):/var/lib/jenkins"
 
-update_current_image $SOURCE_IMAGE
-
-verbose "Running NGINX + PHP5 with args: $CONTAINER_ARGS"
+update_current_image ${SOURCE_IMAGE}
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-$DOCKER_CMD run \
- --rm=true \
- -v "$( pwd ):/var/lib/jenkins" \
- -p 8080 \
- $CONTAINER_ARGS \
- $SOURCE_IMAGE
+server_command ${SOURCE_IMAGE}

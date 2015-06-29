@@ -1,14 +1,9 @@
 #!/bin/bash
-SOURCE_IMAGE=$BASE_OS:couchdb
+SOURCE_IMAGE=${BASE_OS}:couchdb
+add_port 5984
 
-update_current_image $SOURCE_IMAGE
-
-verbose "Running CouchDB with args: $CONTAINER_ARGS"
+update_current_image ${SOURCE_IMAGE}
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-$DOCKER_CMD run \
- --rm=true \
- -p 5984 \
- $CONTAINER_ARGS \
- $SOURCE_IMAGE $*
+server_command ${SOURCE_IMAGE} $*

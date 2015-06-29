@@ -1,15 +1,10 @@
 #!/bin/bash
-SOURCE_IMAGE=$BASE_OS:express
+SOURCE_IMAGE=${BASE_OS}:express
+add_port 3000
+#add_volume "$( pwd ):/workspace"
 
-update_current_image $SOURCE_IMAGE
-
-verbose "Running 'node $*' with args: $CONTAINER_ARGS"
+update_current_image ${SOURCE_IMAGE}
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-$DOCKER_CMD run \
- --rm=true \
- -v "$( pwd ):/workspace" \
- -p 3000 \
- $CONTAINER_ARGS \
- $SOURCE_IMAGE "node $*"
+server_command ${SOURCE_IMAGE} "node $*"
