@@ -1,14 +1,8 @@
 #!/bin/bash
-SOURCE_IMAGE=$BASE_OS:php5-cli
+SOURCE_IMAGE=${BASE_OS}:php5-cli
 
-update_current_image $SOURCE_IMAGE
-
-verbose "Running 'php $*' with args: $CONTAINER_ARGS"
+update_current_image ${SOURCE_IMAGE}
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-$DOCKER_CMD run  \
-$INTERACTIVE -t --rm=true \
- -v "$( pwd ):/overlay" \
- $CONTAINER_ARGS \
- $SOURCE_IMAGE "php $*"
+exec_command ${SOURCE_IMAGE}  "php $*"

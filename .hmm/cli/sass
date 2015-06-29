@@ -1,8 +1,8 @@
 #!/bin/bash
-SOURCE_IMAGE=${BASE_OS}:mean-cli
+SOURCE_IMAGE=${BASE_OS}:yeoman
 
 update_current_image ${SOURCE_IMAGE}
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-exec_command ${SOURCE_IMAGE}  "/usr/bin/mean $*"
+exec_command ${SOURCE_IMAGE}  "sass $*"

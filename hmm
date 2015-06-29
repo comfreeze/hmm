@@ -194,6 +194,27 @@ downloader() {
     fi
 }
 #
+# Core run command with args
+#
+base_command() {
+    verbose "RAW: $*"
+    RETURN_HOLDER="$DOCKER_CMD run $INTERACTIVE -t --rm=true -v $( pwd ):/overlay $CONTAINER_ARGS $1"
+    return
+}
+#
+# Run a command with args
+#
+exec_command() {
+    SOURCE="$1"
+    shift
+    COMMAND="$*"
+    verbose "Running '$COMMAND' with args: $CONTAINER_ARGS"
+    base_command "$SOURCE"
+    HMM_COMMAND="${RETURN_HOLDER}"
+    verbose "$HMM_COMMAND \"${COMMAND}\""
+    ${HMM_COMMAND} "${COMMAND}"
+}
+#
 # Export functions to children
 #
 export -f signature
@@ -207,7 +228,8 @@ export -f container_image
 export -f get_actions
 export -f verify_install_replace
 export -f update_current_image
-
+export -f base_command
+export -f exec_command
 #
 # Command references
 # Alias new versions hack
