@@ -7,8 +7,8 @@ verbose "Running 'npm $*' with args: $CONTAINER_ARGS"
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-$DOCKER_CMD run  \
-$INTERACTIVE -t --rm=true \
+$DOCKER_CMD run \
+ $INTERACTIVE -t --rm=true \
  -v "$( pwd ):/overlay" \
  $CONTAINER_ARGS \
- $SOURCE_IMAGE "/usr/local/bin/npm $*"
+ $SOURCE_IMAGE "/usr/bin/npm $*"

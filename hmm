@@ -240,7 +240,8 @@ verbose "Using $HMM_DIR/.hmm as root for HMM scripts..."
 #
 # Configure interactivity
 #
-if [ -t "$fd" ]; then
+if [ -t 1 ]; then
+#if [ -t "$fd" ]; then
     verbose "Interactive"
 	INTERACTIVE="-a stdin -a stdout -a stderr -i"
 else
