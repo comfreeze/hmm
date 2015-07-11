@@ -149,6 +149,7 @@ _hmm()
     else
         get_actions "${PLUGDIR}"
         actions=${RETURN_HOLDER}
+        cd ${CURDIR}
         COMPREPLY=( $( compgen -W "$actions" -- "$cur" ) )
     fi
 }
