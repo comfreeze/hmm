@@ -19,25 +19,26 @@ signature() {
 get_actions() {
     TARGET=$1
     RESULT=""
-    cd ${TARGET}/
-    for ACTION_FILE in *
+#    echo $TARGET
+    for ACTION_FILE in ${TARGET}/*
     do
+        BASE_ACTION=${ACTION_FILE/$TARGET\//}
+#        echo $BASE_ACTION
         if [[ -f ${ACTION_FILE} ]]; then
         	[[ ${RESULT} = "" ]] || RESULT+=" "
-        	RESULT+="${ACTION_FILE}"
+        	RESULT+="${BASE_ACTION}"
         fi
 
         if [[ -d ${ACTION_FILE} ]]; then
-            cd ${ACTION_FILE}
-            for SUB_ACTION_FILE in *
+            for SUB_ACTION_FILE in ${ACTION_FILE}/*
             do
+                BASE_SUB_ACTION=${BASE_ACTION}-${SUB_ACTION_FILE/$ACTION_FILE\//}
+#                echo $BASE_SUB_ACTION
                 [[ ${RESULT} = "" ]] || RESULT+=" "
-                RESULT+="${ACTION_FILE}-${SUB_ACTION_FILE}"
-			done
-			cd ..
-		fi
+                RESULT+="${BASE_SUB_ACTION}"
+            done
+        fi
     done
-    cd ${CURDIR}
     RETURN_HOLDER=${RESULT}
     return
 }
@@ -121,6 +122,7 @@ _hmm()
     HMM=$( which hmm )
     HMM_PATH=$( ${HMM} --path )
     PLUGDIR="$HMM_PATH/.hmm/"
+#    echo "PLUGDIR: $PLUGDIR"
     COMPREPLY=()
 
     #
