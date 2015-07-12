@@ -1,0 +1,18 @@
+#!/bin/bash
+SOURCE_IMAGE="dockers.comfreeze.net/alpine:xfce"
+
+verbose "Declaring volumes..."
+add_volume ~/:/comfreeze
+add_volume ~/.Xauthority:/comfreeze/.Xauthority
+add_volume /tmp/.X11-unix:/tmp/.X11-unix
+
+verbose "Declaring environment variables..."
+add_env_var DISPLAY=$DISPLAY
+
+verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
+$DOCKER_CMD run --net=host \
+ $INTERACTIVE -t --rm=true \
+ --name=$CONTAINER_NAME \
+ $CONTAINER_ARGS \
+ $DOCKER_NAME \
+ "startxfce4 $*"
