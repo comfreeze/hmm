@@ -25,8 +25,8 @@ get_actions() {
         BASE_ACTION=${ACTION_FILE/$TARGET\//}
 #        echo $BASE_ACTION
         if [[ -f ${ACTION_FILE} ]]; then
-        	[[ ${RESULT} = "" ]] || RESULT+=" "
-        	RESULT+="${BASE_ACTION}"
+#        	[[ ${RESULT} = "" ]] || RESULT+=" "
+        	RESULT+=" ${BASE_ACTION}"
         fi
 
         if [[ -d ${ACTION_FILE} ]]; then
@@ -34,8 +34,8 @@ get_actions() {
             do
                 BASE_SUB_ACTION=${BASE_ACTION}-${SUB_ACTION_FILE/$ACTION_FILE\//}
 #                echo $BASE_SUB_ACTION
-                [[ ${RESULT} = "" ]] || RESULT+=" "
-                RESULT+="${BASE_SUB_ACTION}"
+#                [[ ${RESULT} = "" ]] || RESULT+=" "
+                RESULT+=" ${BASE_SUB_ACTION}"
             done
         fi
     done
@@ -151,9 +151,20 @@ _hmm()
     else
         get_actions "${PLUGDIR}"
         actions=${RETURN_HOLDER}
-        cd ${CURDIR}
-        COMPREPLY=( $( compgen -W "$actions" -- "$cur" ) )
+#        cd ${CURDIR}
+        if [[ $actions == *" $cur"* ]]; then
+#        if [[ $actions != "" ]]; then
+            COMPREPLY=( $( compgen -W "$actions" -- "$cur" ) )
+        else
+            cur=${cur//\\ / }
+            [[ ${cur} == "~/"* ]] && cur=${cur/\-/$HOME}
+            compopt -o filenames
+            local files=("${cur}"*)
+            [[ -e ${files[0]} ]] && COMPREPLY=( "${files[@]// /\ }" )
+            return 0
+        fi
     fi
 }
+#compopt -o bashdefault
 #complete -F _hmm ${filenames} hmm
-complete -F _hmm hmm
+complete -o bashdefault -F _hmm hmm
