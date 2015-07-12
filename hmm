@@ -271,6 +271,21 @@ server_command() {
     ${HMM_COMMAND} "${COMMAND}"
 }
 #
+# Nest quotes on args
+#
+requote() {
+    RESULT=''
+    for i in "$@"; do
+#        echo $i
+        [[ RESULT == "" ]] || RESULT+=" "
+        RESULT+="\"${i//\"/\\\"}\""
+#	echo $RESULT
+    done
+#    printargs "${RESULT[@]}"
+    RETURN_HOLDER="${RESULT[@]}"
+    return
+}
+#
 # Export functions to children
 #
 export -f signature
@@ -656,8 +671,13 @@ while test $# -gt 0; do
 	esac
 done
 
+# Post-process arguments for quotes
+requote "$@"
+ARGS="$RETURN_HOLDER"
+#echo "ARGS: ${ARGS[@]}"
+
 if [ "$ACTION" != "" ]; then
-	/bin/bash "$ACTION" $*
+	/bin/bash "$ACTION" ${ARGS[@]}
 #	exit 0
 else
 	usage

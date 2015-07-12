@@ -7,4 +7,4 @@ update_current_image $SOURCE_IMAGE
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-exec_command ${SOURCE_IMAGE} ${CONTAINER_ARGS}  "git $*"
+exec_command ${SOURCE_IMAGE} ${CONTAINER_ARGS} "git $@"
