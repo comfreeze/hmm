@@ -1,6 +1,8 @@
 #!/bin/bash
 SOURCE_IMAGE=${BASE_OS}:mean-cli
 
+add_volume $( pwd ):/overlay
+
 update_current_image ${SOURCE_IMAGE}
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"

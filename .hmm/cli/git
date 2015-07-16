@@ -1,10 +1,41 @@
 #!/bin/bash
 SOURCE_IMAGE=$BASE_OS:git
 
+verbose "Using ${SOURCE_IMAGE}..."
+
+# Import credentials
+verbose "Injecting local credentials (~/.ssh)..."
 add_volume ~/.ssh:/comfreeze/.ssh
+
+__CURRENT_PATH=$( pwd )
+
+find_parent() {
+    path="$__CURRENT_PATH"
+    verbose "Testing $path..."
+#    shift 1
+    while [[ "$path" != "/" ]];
+    do
+        result=$( find "$path" -maxdepth 1 -mindepth 1 -type d -name "\.git" )
+        # Note: if you want to ignore symlinks, use "$(realpath -s $path/..)"
+        if [[ "$result" != "" ]]; then
+            result="$path"
+            verbose "Found .git parent: $result"
+            break
+        fi
+        path="$(readlink -f $path/..)"
+    done
+    RETURN_HOLDER="$result"
+    verbose "Returning $RETURN_HOLDER"
+    return
+}
+
+find_parent
+__PARENT="${RETURN_HOLDER-"${__CURRENT_PATH}"}"
+verbose "Using parent directory: $__PARENT"
+add_volume $__PARENT:/overlay
 
 update_current_image $SOURCE_IMAGE
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-exec_command ${SOURCE_IMAGE} ${CONTAINER_ARGS} "git $@"
+exec_command ${SOURCE_IMAGE} "git $@"

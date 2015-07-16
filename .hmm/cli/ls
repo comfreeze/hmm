@@ -1,5 +1,5 @@
 #!/bin/bash
-SOURCE_IMAGE=$BASE_OS:yeoman
+SOURCE_IMAGE=$BASE_OS:base
 
 add_volume $( pwd ):/overlay
 
@@ -7,4 +7,4 @@ update_current_image $SOURCE_IMAGE
 
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 
-exec_command ${SOURCE_IMAGE}  "grunt $*"
+exec_command ${SOURCE_IMAGE} "ls $@"
