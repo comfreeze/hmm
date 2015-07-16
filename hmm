@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=0.8.3
+VERSION=0.8.4
 
 #
 # Global defaults
@@ -197,8 +197,14 @@ downloader() {
 # Assemble container arguments
 #
 container_arguments() {
-    RETURN_HOLDER="$ENV_VARS $PORTS $VOLUMES $LINKING"
+    RETURN_HOLDER="$FLAGS $ENV_VARS $PORTS $VOLUMES $LINKING"
     return
+}
+#
+# Add additional docker flags/options
+#
+add_flag() {
+    FLAGS+=" $1"
 }
 #
 # Add new environment variable
@@ -231,7 +237,7 @@ exec_base() {
     verbose "RAW: $*"
     container_arguments
     CONTAINER_ARGS=${RETURN_HOLDER}
-    RETURN_HOLDER="$DOCKER_CMD run $INTERACTIVE -t --rm=true -v $( pwd ):/overlay $CONTAINER_ARGS $1"
+    RETURN_HOLDER="$DOCKER_CMD run $INTERACTIVE -t --rm=true $CONTAINER_ARGS $1"
     return
 }
 #
@@ -254,7 +260,7 @@ server_base() {
     verbose "RAW: $*"
     container_arguments
     CONTAINER_ARGS=${RETURN_HOLDER}
-    RETURN_HOLDER="$DOCKER_CMD run --rm=true -v $( pwd ):/overlay $CONTAINER_ARGS $1"
+    RETURN_HOLDER="$DOCKER_CMD run --rm=true $CONTAINER_ARGS $1"
     return
 }
 #
@@ -300,6 +306,7 @@ export -f get_actions
 export -f verify_install_replace
 export -f update_current_image
 export -f container_arguments
+export -f add_flag
 export -f add_env_var
 export -f add_port
 export -f add_volume
