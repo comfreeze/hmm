@@ -5,4 +5,5 @@ PID=$RETURN_HOLDER
 not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
 
 verbose "Entering namespace for $CONTAINER_NAME (PID: $PID)"
-sudo nsenter --target $PID --mount --uts --ipc --net --pid $*
+#sudo nsenter --target $PID --mount --uts --ipc --net --pid $*
+docker-enter $CONTAINER_NAME
