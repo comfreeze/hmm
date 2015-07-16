@@ -143,26 +143,24 @@ _hmm()
     SHORT=$RETURN_HOLDER
     long_opts
     LONG=$RETURN_HOLDER
+    get_actions "${PLUGDIR}"
+    actions="${RETURN_HOLDER} "
     #    actions=$(for x in $PLUGDIR; do echo $(basename ${x%}); done)
-    if [[ ${COMP_WORDS[COMP_CWORD]} == "-" ]]; then
+    if [[ $actions == *" $prev "* ]]; then
+        echo $prev
+    elif [[ ${cur} == "-" ]]; then
         COMPREPLY=( $( compgen -W "$SHORT $LONG" -- "$cur" ) )
-    elif [[ ${COMP_WORDS[COMP_CWORD]} == "--" ]]; then
+    elif [[ ${cur} == "--" ]]; then
         COMPREPLY=( $( compgen -W "$LONG" -- "$cur" ) )
+    elif [[ $actions == *" $cur"* ]]; then
+        COMPREPLY=( $( compgen -W "$actions" -- "$cur" ) )
     else
-        get_actions "${PLUGDIR}"
-        actions=${RETURN_HOLDER}
-#        cd ${CURDIR}
-        if [[ $actions == *" $cur"* ]]; then
-#        if [[ $actions != "" ]]; then
-            COMPREPLY=( $( compgen -W "$actions" -- "$cur" ) )
-        else
-            cur=${cur//\\ / }
-            [[ ${cur} == "~/"* ]] && cur=${cur/\-/$HOME}
-            compopt -o filenames
-            local files=("${cur}"*)
-            [[ -e ${files[0]} ]] && COMPREPLY=( "${files[@]// /\ }" )
-            return 0
-        fi
+        cur=${cur//\\ / }
+        [[ ${cur} == "~/"* ]] && cur=${cur/\-/$HOME}
+        compopt -o filenames
+        local files=("${cur}"*)
+        [[ -e ${files[0]} ]] && COMPREPLY=( "${files[@]// /\ }" )
+        return 0
     fi
 }
 #compopt -o bashdefault
