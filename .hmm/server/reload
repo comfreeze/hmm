@@ -1,0 +1,15 @@
+#!/bin/bash
+
+not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
+not_empty "$DOCKER_NAME" "DOCKER_NAME not found!"
+not_empty "$CONTAINER_NAME" "CONTAINER_NAME empty!"
+
+verbose "Stopping $DOCKER_NAME..."
+$DOCKER_CMD stop $CONTAINER_NAME
+
+verbose "Destroying $CONTAINER_NAME..."
+$DOCKER_CMD rm $CONTAINER_NAME
+
+verbose "Starting $DOCKER_NAME..."
+__COMMAND=${RUN_CMD-"/overlay/run"}
+server_command ${SOURCE_IMAGE} "$__COMMAND $*"
