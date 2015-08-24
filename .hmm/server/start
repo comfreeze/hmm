@@ -1,13 +1,22 @@
 #!/bin/bash
 verbose "Running '$*' in $DOCKER_NAME with args: $CONTAINER_ARGS"
 
+#add_flag -d
+add_volume $( pwd ):/webroot
+
 not_empty "$DOCKER_CMD" "DOCKER_CMD not found!"
 not_empty "$PARENT" "PARENT is not defined!"
 
 update_current_image $PARENT
 
-$DOCKER_CMD run \
- -d --name=$CONTAINER_NAME \
- $CONTAINER_ARGS \
- $PARENT \
- "$RUN_CMD $*"
+#SOURCE_IMAGE=${PARENT}
+SOURCE_IMAGE=${DOCKER_NAME}
+
+__COMMAND=${RUN_CMD-"/overlay/run"}
+server_command ${SOURCE_IMAGE} "$__COMMAND $*"
+
+#$DOCKER_CMD run \
+# -d --name=$CONTAINER_NAME \
+# $CONTAINER_ARGS \
+# $PARENT \
+# "$RUN_CMD $*"
